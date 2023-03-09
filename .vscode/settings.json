@@ -1,0 +1,19 @@
+{
+    "python.linting.pydocstyleEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.pycodestyleEnabled": true,
+
+    "blender.addon.moduleName": "Grouper",
+    "python.linting.pycodestyleCategorySeverity.E": "Hint",
+    "python.linting.pycodestyleCategorySeverity.W": "Information",
+
+    "python.analysis.extraPaths": [
+        "./autocomplete/3.4"
+    ],
+
+    "python.autoComplete.extraPaths": [
+        "./autocomplete/3.4"
+    ],
+    "blender.addon.reloadOnSave": true,
+    "blender.addon.sourceDirectory": "E:\\Apps\\Blender\\3.4\\scripts\\addons\\Grouper"
+}

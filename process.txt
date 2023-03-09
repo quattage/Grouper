@@ -1,0 +1,153 @@
+
+-Assign a default midpoint value to around 10k or something. This value can either be manually changed or automatically changed
+
+## When the user clicks the "calculate midpoint" button
+    -Loop through all selected objects
+        -Add up all polycounts to acquire sum total counter of polys for the entire selection
+    -Divide the total polygons by the total selected objects
+    -Sset the midpoint interactable value to this value
+This allows the "calculate midpoint" to automatically derive an average value of polygons across the whole selection
+## This is useful for deciding which meshes are considered "highpoly" (above the midpoint value) and which meshes are considered "lowpoly" (below the midpoint)
+
+## When the user clicks the "Make Groups" button:
+    -Add a custom "High" collection if one does not exist already
+    -Add a custom "Low" collection if one does not exist already
+## That's all this function does :))
+
+## When the user clicks the "Split Selection" button:
+    -Add a custom "High" collection if one does not exist already
+    -Add a custom "Low" collection if one does not exist already
+    -Add a custom "Unresolved" collection if one does not exist already
+
+    -Loop through all selected objects
+        -If this object is NOT A MESH, do the following:
+            -Warn the user that there was a non-mesh object in the selection, and state its name
+            -Move this object to the "Unresolved" collection
+        If this object IS A MESH, do the following:
+            -Check if it is already in a collection called "High" or "Low"
+                -If this collection is called "High"
+                    -Add this to the list of high poly objects
+                -If this collection is called "Low"
+                    -Add this to the list of low poly objects
+            -If this mesh is not in a collection called "High" or "Low", do the following:
+                -If the mesh has a subdivision surface modifier       <---- maybe also have an option to disable this check if the user does not want this     
+                    -Add it to the list if high poly objects
+                -If the mesh does not have a subdivision surface modifier
+                    -If the mesh is above the average polycount
+                        -Add it to the list of high poly objects
+                    -If the mesh is below the average polycount
+                        -Add it to the list of low poly objects
+                    -If the mesh is within a very close threshhold to the midpoint
+                        -Warn the user that the mesh could not be sorted, and state its name
+                        -Move this mesh to the "Unresolved" collection
+## This function divides the selection into groups of high poly and low poly objects. This is only really useful for people who don't sort their models as they make them
+
+
+
+## When the user clicks the "Resolve Selection" button:
+    -Create a list of high poly objects with this scope
+    -Create a list of low poly objects with this scope
+
+    -Loop through all selected objects
+        -If this object is NOT IN A "High" or "Low" collection, or is NOT A MESH:
+            -Name this object "unresolved_generic" even if this name is already taken
+           
+        -If this object is in a "High" or "Low" collection
+            -If this object is in the "High" collection
+                -Add this object to the defined list of high poly objects
+            -If this object is in the "Low" collection
+                -Add this object to the defined list of low poly objects
+
+    -Loop through the now populated list of high poly objects                    #### any mentions of naming an object "1" are meant to describe naming the object after the number of iterations of the active loop
+        -We are now at high poly object 1
+        -Get this high poly's origin location
+        -Keep track of this object's status with a boolean called "Matched" initialized as false.
+        Loop through the now populated list of low poly objects ----------
+            -Get this object's origin location
+            -Compare the high poly's origin location to this low poly's origin location, if they're within a small distance of each other:
+                -Name this object and "1" and give it the suffix with an underscore. This would make it "1_low"
+                -Set "Matched" to true to confirm that this low poly and high poly are cooresponding
+            -If this object does not match the high poly object:
+                -Matched was initialized as false and as such will not need to be addressed here
+                -Name this object "unresolved_low" even if this name is already taken
+            We are now leaving the loop of low poly objects ------------
+        if "Matched" is true for this high poly object
+            -Name this object and "1" and give it the suffix with an underscore. This would make it "1_high"
+        if "Matched" is false for this high poly object
+            -Name this object "unresolved_high" even if this name is already taken
+    -Repeat this process for every object, even the unresolved ones
+    -If any objects containing the word "Unresolved" still remain in the selection once this loop is completed, they must be moved to the "Unresolved" collection.
+    -Warn the user that (x) amount of objects remain unresolved
+## This functon will effectively group each mesh by name, ensuring that the cooresponding high and low poly meshes match based on the locations of their origins
+
+At the moment, this would effectively group everything together in two collections based on high and low. This does not account for sub-collections. 
+
+
+
+
+
+    
+
+
+
+createCollection(list of collections)
+
+    REVERSE THIS LIST OF COLLECTIONS FIRST BEFORE DOING ANYTHING ELSE HOLY FUCK 
+
+    the order should be lowest to highest level
+    ex. subber_collection -> sub_collection -> root_collection -> scene_collection
+                                                                    the scene collection is not included
+                                                                    it's implied
+    for enumerated list of collections
+        collection exists = false
+
+        create a destination collection which is a blank collection instance:
+        destination_collection = None
+
+        if the enumerator value is not 0
+			set destination_collection to the previous item in the list
+	
+		if the collection doesn't exist at all
+            create a new collection with the name at this index
+            if destination_collection is None
+                link the collection to the scene
+            if destination_collection is not None
+                link the collection to the destination_collection
+
+        if the collection DOES already exist somewhere in the blender file
+            unlink the collection with this name
+            if destination_collection is None
+                link this collection to the Scene collection
+            if destionation_collection is not None
+                link this collection to the destination_collection
+            
+            
+
+        
+            
+                
+        
+
+
+#EVERY OBJECT NEEDS TO:
+
+delete(obj, list)
+# deletes an object, accepts list or object
+
+#rename(obj, list)
+# renames an object, accepts list or object
+
+#move(obj, list, coll)
+# moves obj from wherever it is to the specified collection
+OR moves list of objects from wherever they are to the specified collection
+
+
+
+exists(str) -> bool
+# does an object called (str) exist?
+
+get(str) -> object
+# get the object called (str) from the outliner. Return NoneType if it doesn't exist
+
+get(coll) -> list
+# get all of the objects inside of (coll) and return them as a list
