@@ -4,21 +4,26 @@ from bpy.types import Panel, PropertyGroup
 from .utils.logger import logger
 from . import meshdist
 
+mid = meshdist.MD_Midpoint()
 
-high_items = []
-low_items = []
+high_items = [
+    (mid.identifier, mid, "")
+]
 
-def populate_enums(lst):
+low_items = [
+    (mid.identifier, mid, "")
+]
+
+def populate_enums(distlist):
     enum_items = []
-    for e, d in enumerate(lst):
-        enum_items.append((d[0], d[1], d[2], d[3]))
-
-    logger.log(enum_items)
+    for i, entry in enumerate(distlist):
+        enum_items.append((entry[0], entry[0], str(entry[1]), i))
+        print("piss manufacturing: " + str(enum_items))
     return enum_items
 
 
 def add_item(dist, lst):
-    lst.append((dist.identifier, dist, dist.name, dist.used))
+    lst.append(dist)
     populate_enums(lst)
 
 
@@ -46,8 +51,8 @@ class GROUPER_PT_OpsPanel(Panel):
         row = layout.row()
         row.prop(context.scene, "poly_midpoint")
         row.operator('grouper.calc_midpoint', text='Calculate')
-        
-        
+
+
 class GROUPER_PT_EnumsPanel(Panel):
     bl_label = "Distinguishers"
     bl_idname = "GROUPER_PT_EnumsPanel"
@@ -59,8 +64,6 @@ class GROUPER_PT_EnumsPanel(Panel):
         props = props = bpy.context.scene.GROUPER_PT_PrefsProperties
         global enums
         enums = bpy.context.scene.GROUPER_PT_EnumProperties
-
-        set_defaults()
 
         layout = self.layout
         box = layout.box()
@@ -93,7 +96,7 @@ class GROUPER_PT_EnumsPanel(Panel):
 def set_defaults():
     mid = meshdist.MD_Midpoint()
     add_item(mid, high_items)
-    
+
     mid = meshdist.MD_Midpoint()
     add_item(mid, low_items)
 
