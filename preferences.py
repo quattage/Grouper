@@ -1,7 +1,10 @@
 import bpy
 from bpy.props import StringProperty
+from bpy.props import EnumProperty
 from bpy.types import PropertyGroup
 from bpy.types import AddonPreferences
+
+
 
 
 class GROUPER_PT_PrefsProperties(PropertyGroup):
@@ -22,7 +25,7 @@ class GROUPER_PT_PrefsPanel(AddonPreferences):
         row = box.row(align=True)
         row.label(text="Suffixes:")
         row.prop(props, "low_suffix", text="Low")
-        row.prop(props, "low_collection_name", text="High")
+        row.prop(props, "high_suffix", text="High")
 
         row = box.row(align=True)
         row.label(text="Collections:")

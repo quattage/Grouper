@@ -27,8 +27,10 @@ import bpy
 import os
 
 from .panel import GROUPER_PT_OpsPanel
+from .panel import GROUPER_PT_EnumsPanel
 from .preferences import GROUPER_PT_PrefsPanel
 from .preferences import GROUPER_PT_PrefsProperties
+from .panel import GROUPER_PT_EnumProperties
 
 from .utils.logger import logger
 
@@ -36,12 +38,12 @@ from .utils.logger import logger
 GROUPER_Misc = [
     GROUPER_PT_OpsPanel,
     GROUPER_PT_PrefsPanel,
+    GROUPER_PT_EnumsPanel,
 ]
 
 
 GROUPER_OpsProperties = (
     ('poly_midpoint', bpy.props.IntProperty(name='Mid', default=10000, description="Midpoint in tris. Anything above this triangle count will be considered high-poly and anything below it will be considered low-poly")),
-    ('use_modifiers', bpy.props.BoolProperty(name='Use Modifiers', default=True, description="When enabled, Grouper will automatically classify objects with a subdivision surface or bevel modifier as high-poly, instead of using the pre-defined Midpoint value")),
 )
 
 
@@ -51,6 +53,7 @@ def register():
     register_modules("operators", "LOAD")
     register_props("LOAD")
     register_preferences("LOAD")
+    register_enums("LOAD")
     register_misc("LOAD")
     logger.log("MODULES REGISTERED", "REGISTRY")
 
@@ -65,12 +68,26 @@ def unregister():
 
 def register_preferences(operation: str = "LOAD"):
     if operation == "LOAD":
+        logger.log("Added " + GROUPER_PT_PrefsProperties.__name__ + " to bpy.types.scene", "REGISTRY")
         bpy.utils.register_class(GROUPER_PT_PrefsProperties)
         bpy.types.Scene.GROUPER_PT_PrefsProperties = bpy.props.PointerProperty(type=GROUPER_PT_PrefsProperties)
     elif operation == "UNLOAD":
         try:
             bpy.utils.unregister_class(GROUPER_PT_PrefsProperties)
             del bpy.types.Scene.GROUPER_PT_PrefsProperties
+        except:
+            pass
+
+
+def register_enums(operation: str = "LOAD"):
+    if operation == "LOAD":
+        logger.log("Added " + GROUPER_PT_EnumProperties.__name__ + " to bpy.types.scene", "REGISTRY")
+        bpy.utils.register_class(GROUPER_PT_EnumProperties)
+        bpy.types.Scene.GROUPER_PT_EnumProperties = bpy.props.PointerProperty(type=GROUPER_PT_EnumProperties)
+    elif operation == "UNLOAD":
+        try:
+            bpy.utils.unregister_class(GROUPER_PT_EnumProperties)
+            del bpy.types.Scene.GROUPER_PT_EnumProperties
         except:
             pass
 

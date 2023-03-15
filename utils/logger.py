@@ -23,4 +23,4 @@ class logger:
                 prefix = "\033[91m GROUPER ERROR: \033[3m"
             reset = "\u001b[0m"
             header = "\033[93m >>>" + reset
-            print(header, prefix + message)
+            print(header, prefix + message + reset)

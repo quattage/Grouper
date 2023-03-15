@@ -1,3 +1,20 @@
+MATERIALS
+
+Blender Docs - Property Definitions
+https://docs.blender.org/api/current/bpy.types.UILayout.html#bpy.types.UILayout.prop_enum
+
+Blender Docs - bpy.props
+https://docs.blender.org/api/current/bpy.props.html#bpy.props.EnumProperty
+
+Blender Docs - UILayout functions
+https://docs.blender.org/api/current/bpy.types.UILayout.html
+
+Dynamic Reloading EnumProperty example
+https://blenderartists.org/t/add-remove-enumproperty-items/1305166/8
+
+
+
+
 
 -Assign a default midpoint value to around 10k or something. This value can either be manually changed or automatically changed
 
