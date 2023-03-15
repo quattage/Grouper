@@ -62,6 +62,7 @@ def unregister():
     register_modules("operators", "UNLOAD")
     register_props("UNLOAD")
     register_preferences("UNLOAD")
+    register_enums("UNLOAD")
     register_misc("UNLOAD")
     logger.log("MODULES UNREGISTERED", "REGISTRY")
 

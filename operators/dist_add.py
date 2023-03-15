@@ -7,7 +7,8 @@ class GROUPER_OT_DistAdd(bpy.types.Operator):
     bl_label = 'Add Distinguisher'
     bl_description = 'Add new enum item'
 
-    new_name: bpy.props.StringProperty(default= 'Preset name', name = 'Preset name ')
+    use_low = bpy.props.BoolProperty(default=False, name = "Change Low")
+    
 
     def execute(self, context):
         logger.log("Add Dist", "")
