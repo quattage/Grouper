@@ -1,10 +1,7 @@
 import bpy
-from bpy.props import StringProperty
-from bpy.props import EnumProperty
+from bpy.props import BoolProperty, IntProperty, StringProperty
 from bpy.types import PropertyGroup
 from bpy.types import AddonPreferences
-
-
 
 
 class GROUPER_PT_PrefsProperties(PropertyGroup):
@@ -13,6 +10,18 @@ class GROUPER_PT_PrefsProperties(PropertyGroup):
     low_collection_name: StringProperty(description="Name of the collections that store lowpoly objects", default="Lowpoly")
     high_collection_name: StringProperty(description="Name of the collections that store highpoly objects", default="Highpoly")
 
+class GROUPER_PT_MDList(PropertyGroup):
+    name: StringProperty(default="")
+    identifier: StringProperty(default="")
+    icon_name: StringProperty(default="")
+    custom_args: StringProperty(default="")
+    condition: BoolProperty(default=True)
+    destination_name: StringProperty(default="")
+    
+
+class GROUPER_PT_GDList(PropertyGroup):
+    name: StringProperty(default="")
+    identifier: StringProperty(default="")
 
 class GROUPER_PT_PrefsPanel(AddonPreferences):
     bl_idname = __package__

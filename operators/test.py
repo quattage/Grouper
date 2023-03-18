@@ -12,8 +12,9 @@ class GROUPER_OT_Test(bpy.types.Operator):
     
     def execute(self, context):
         
-        objects = objman.get_children(collman.get("High"))
-        objman.move(objects, collman.get("Low"))
+        global_mdlist = context.scene.grouper_mdlist
+        global_mdlist.clear()
+        self.report({"INFO"}, "dists cleared")
 
         return {"FINISHED"}
     

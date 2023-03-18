@@ -7,7 +7,9 @@ class GROUPER_OT_DistRemove(bpy.types.Operator):
     bl_label = 'Remove Distinguisher'
     bl_description = 'Remove old enum item'
 
-    obj_to_remove: bpy.props.StringProperty(default="", name = "To Remove")
+    global to_remove
+    to_remove = ""
+    
     use_low: bpy.props.BoolProperty(default=False, name = "Change Low")
 
     def execute(self, context):

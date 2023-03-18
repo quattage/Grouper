@@ -26,12 +26,14 @@ import importlib
 import bpy
 import os
 
+from bpy.props import IntProperty
+from bpy.app.handlers import persistent
+
 from .panel import GROUPER_PT_OpsPanel
+from .panel import GROUPER_UL_MDViewer
 from .panel import GROUPER_PT_EnumsPanel
 from .preferences import GROUPER_PT_PrefsPanel
-from .preferences import GROUPER_PT_PrefsProperties
-from .panel import GROUPER_PT_EnumProperties
-
+from .preferences import GROUPER_PT_PrefsProperties, GROUPER_PT_MDList, GROUPER_PT_GDList
 from .utils.logger import logger
 
 
@@ -39,6 +41,7 @@ GROUPER_Misc = [
     GROUPER_PT_OpsPanel,
     GROUPER_PT_PrefsPanel,
     GROUPER_PT_EnumsPanel,
+    GROUPER_UL_MDViewer
 ]
 
 
@@ -47,50 +50,65 @@ GROUPER_OpsProperties = (
 )
 
 
-
 def register():
     logger.enable()
     register_modules("operators", "LOAD")
     register_props("LOAD")
-    register_preferences("LOAD")
-    register_enums("LOAD")
+    register_pointers("LOAD")
     register_misc("LOAD")
+    bpy.app.handlers.load_post.append(load_handler)
+    bpy.app.handlers.load_factory_startup_post.append(load_startup_handler)
     logger.log("MODULES REGISTERED", "REGISTRY")
+
+
+@persistent
+def load_handler(dummy):
+    bpy.ops.grouper.register_defaults()
+
+
+def load_startup_handler(dummy):
+    bpy.ops.grouper.register_defaults()
 
 
 def unregister():
     register_modules("operators", "UNLOAD")
     register_props("UNLOAD")
-    register_preferences("UNLOAD")
-    register_enums("UNLOAD")
+    register_pointers("UNLOAD")
     register_misc("UNLOAD")
     logger.log("MODULES UNREGISTERED", "REGISTRY")
+    
 
-
-def register_preferences(operation: str = "LOAD"):
+def register_pointers(operation: str = "LOAD"):
     if operation == "LOAD":
-        logger.log("Added " + GROUPER_PT_PrefsProperties.__name__ + " to bpy.types.scene", "REGISTRY")
+        logger.log("Added " + GROUPER_PT_PrefsProperties.__name__ + " as PointerProperty to bpy.types.scene", "REGISTRY")
         bpy.utils.register_class(GROUPER_PT_PrefsProperties)
-        bpy.types.Scene.GROUPER_PT_PrefsProperties = bpy.props.PointerProperty(type=GROUPER_PT_PrefsProperties)
+        bpy.types.Scene.grouper_prefs = bpy.props.PointerProperty(type=GROUPER_PT_PrefsProperties)
+        bpy.utils.register_class(GROUPER_PT_MDList)
+        bpy.types.Scene.grouper_mdlist = bpy.props.CollectionProperty(type=GROUPER_PT_MDList)
+        bpy.utils.register_class(GROUPER_PT_GDList)
+        bpy.types.Scene.grouper_gdlist = bpy.props.CollectionProperty(type=GROUPER_PT_GDList)
+        
+        bpy.types.Scene.grouper_mdlist_index = IntProperty(name="MDList Index", default=0)
+        bpy.types.Scene.grouper_gdlist_index = IntProperty(name="GDList Index", default=0)
+    
+        
     elif operation == "UNLOAD":
         try:
             bpy.utils.unregister_class(GROUPER_PT_PrefsProperties)
             del bpy.types.Scene.GROUPER_PT_PrefsProperties
         except:
             pass
-
-
-def register_enums(operation: str = "LOAD"):
-    if operation == "LOAD":
-        logger.log("Added " + GROUPER_PT_EnumProperties.__name__ + " to bpy.types.scene", "REGISTRY")
-        bpy.utils.register_class(GROUPER_PT_EnumProperties)
-        bpy.types.Scene.GROUPER_PT_EnumProperties = bpy.props.PointerProperty(type=GROUPER_PT_EnumProperties)
-    elif operation == "UNLOAD":
         try:
-            bpy.utils.unregister_class(GROUPER_PT_EnumProperties)
-            del bpy.types.Scene.GROUPER_PT_EnumProperties
+            bpy.utils.unregister_class(GROUPER_PT_MDList)
+            del bpy.types.Scene.GROUPER_PT_MDList
         except:
             pass
+        try:
+            bpy.utils.unregister_class(GROUPER_PT_GDList)
+            del bpy.types.Scene.GROUPER_PT_GDList
+        except:
+            pass
+        
 
 
 def register_misc(operation: str = "LOAD"):
@@ -115,7 +133,7 @@ def register_modules(sub: str, operation: str = "LOAD"):
         for module in modules_list:            
             impexec = "from ." + sub + " import " + module
             exec(impexec)
-            importlib.reload(eval(module))
+            importlib.reload(eval(module))        # i am very sorry
             class_to_load = eval(module).op_class
             if operation == "LOAD":
                 logger.log("Loading " + __name__ + "/" + sub + "/" + module + ".py/" + class_to_load.__name__ + ".class", "REGISTRY")
