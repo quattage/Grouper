@@ -24,6 +24,7 @@ class GROUPER_OT_RegisterDefaults(bpy.types.Operator):
                 mdlist.icon_name = entry.icon_name
                 mdlist.custom_args = json.dumps(entry.custom_args)
                 mdlist.destination_name = entry.destination_name
+                mdlist.description = entry.description
                 
         
         return {'FINISHED'}

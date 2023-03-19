@@ -11,7 +11,7 @@ class GROUPER_OT_GenCollections(bpy.types.Operator):
 
     def execute(self, context):
         logger.log("Generating Collections", "")
-        props = bpy.context.scene.GROUPER_PT_PrefsProperties
+        props = bpy.context.scene.grouper_prefs
         
         raw = collman.create("Raw")
         unresolved = collman.create("Unresolved")

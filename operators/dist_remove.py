@@ -7,13 +7,20 @@ class GROUPER_OT_DistRemove(bpy.types.Operator):
     bl_label = 'Remove Distinguisher'
     bl_description = 'Remove old enum item'
 
-    global to_remove
-    to_remove = ""
     
-    use_low: bpy.props.BoolProperty(default=False, name = "Change Low")
 
     def execute(self, context):
-        logger.log("Remove Dist", "")
+        mdlist = context.scene.grouper_mdlist
+        mdlist_index = context.scene.grouper_mdlist_index
+        
+        if not mdlist_index > len(mdlist):
+            if mdlist[mdlist_index]:
+                mdlist.remove(mdlist_index)
+            else:
+                self.report({'WARN'}, "Something went wrong")
+        else: 
+            self.report({'WARN'}, "Grouper: No active element")
+        
         return {'FINISHED'}
 
 

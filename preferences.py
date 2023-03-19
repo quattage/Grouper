@@ -17,6 +17,7 @@ class GROUPER_PT_MDList(PropertyGroup):
     custom_args: StringProperty(default="")
     condition: BoolProperty(default=True)
     destination_name: StringProperty(default="")
+    description: StringProperty(default="")
     
 
 class GROUPER_PT_GDList(PropertyGroup):

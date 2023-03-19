@@ -1,7 +1,8 @@
-import bpy
+import bpy, textwrap
 from bpy.props import BoolProperty
 from bpy.types import Panel, UIList
 from .utils.logger import logger
+from .distinguishers import meshdist
 
 
 def populate_enums(distlist):
@@ -41,39 +42,156 @@ class GROUPER_PT_EnumsPanel(Panel):
     bl_parent_id = "GROUPER_PT_OpsPanel"
 
     def draw(self, context):
-        prefs = bpy.context.scene.grouper_prefs      
+        prefs = bpy.context.scene.grouper_prefs  
+        mdlist = bpy.context.scene.grouper_mdlist
+        mdlist_index = bpy.context.scene.grouper_mdlist_index
         scene = context.scene
-        
+
         layout = self.layout
-        layout.label(text="" + "Mesh")
-        row = layout.row()
-        row.template_list("GROUPER_UL_MDViewer", "MD_List", scene, "grouper_mdlist", scene, "grouper_mdlist_index")
-        box = layout.box()
-        row = box.row(align=True)
-        row.operator('grouper.dist_add', icon="ADD", text="")
-        row.operator('grouper.dist_remove', icon="REMOVE", text="")
+        layout.label(icon="FILE_VOLUME", text="Mesh Seperators")
+        row = layout.row(align=True)
         
         
+        adjustmentscoll = row.column(align=True)
+        adjustmentbox = adjustmentscoll.box()
+        listcoll = row.column(align=True)
+        
+        listcoll.template_list("GROUPER_UL_MDViewer", "MD_List", scene, "grouper_mdlist", scene, "grouper_mdlist_index")
+
+        add_button = adjustmentbox.column(align=True)
+        add_button.operator('grouper.dist_add', icon="ADD", text="")
+
+        sub_button = add_button.row(align=True)
+        sub_button.operator('grouper.dist_remove', icon="REMOVE", text="")
+        sub_button.enabled = is_positional(mdlist)
+
+        move_buttons = add_button.column(align=True)
+        move_buttons.enabled = get_active(mdlist, mdlist_index) and is_positional(mdlist)
+
+        move_buttons_up = move_buttons.row(align=True)
+        move_buttons_up.operator('grouper.dist_add', icon="TRIA_UP", text="")
+        move_buttons_up.enabled = can_move_up(mdlist_index)
+
+        move_buttons_down = move_buttons.row(align=True)
+        move_buttons_down.operator('grouper.dist_add', icon="TRIA_DOWN", text="")
+        move_buttons_down.enabled = can_move_down(mdlist, mdlist_index)
+        
+        helpbox = adjustmentscoll.box()
+        helpbox.operator('grouper.dist_help', icon="QUESTION", text="")
+
+
+def get_active(mdlist, mdlist_index):
+    try:
+        active = mdlist[mdlist_index]
+        return active
+    except IndexError:
+        return False
+
+
+def is_positional(mdlist):
+    if len(mdlist) > 1:
+        return True
+    return False
+
+
+def can_move_up(mdlist_index) -> bool:
+    return mdlist_index > 0
+
+
+def can_move_down(mdlist, mdlist_index) -> bool:
+    return mdlist_index < len(mdlist) - 1
 
 
 class GROUPER_UL_MDViewer(UIList):
-    
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propnale, index):
+    def draw_filter(self, context, layout):
+        prefs = bpy.context.scene.grouper_prefs 
+        mdlist = bpy.context.scene.grouper_mdlist
+        mdlist_index = bpy.context.scene.grouper_mdlist_index
+        
+        inspector = layout.box()
+        icontent_header = inspector.row(align=True)
+
+        
+        active_item = get_active(mdlist, mdlist_index)
+        """
+        .name -> str
+        .identifier -> str
+        .icon_name -> str
+        .custom_args -> dict AS STR
+        .condition -> bool
+        .destination_name -> str
+        """
+
+        if not active_item:
+            icontent_header.label(icon="FILE_BLANK")
+            icontent_header.label(text=" Select a Distinguisher")
+        else:
+            item = meshdist.serialize(active_item)
+            icontent_header.label(icon="FILE_VOLUME")
+            icontent_header.label(text=" " + item.name)
+            
+            
+            infoview = inspector.column(align=True)
+            infoview.label(text="Description:")
+            wrap(item.description + ", move the object to '" + item.destination_name + "'", infoview.box())
+            infoview = inspector.column(align=True).row()
+            
+            argsview = inspector.column(align=True)
+            argsview.separator()
+            argsview_header= argsview.row(align=True)
+            argsview_header.label(text="Custom Arguments:")
+            argsview_header.operator('grouper.dist_add', icon="MODIFIER_ON", text = "")
+            for key, value in item.custom_args.items():
+                arg = argsview.box().row(align=True)
+                arg.label(icon="FILE_CACHE", text=formatkey(key))
+                arg.label(icon="TRIA_RIGHT", text=formatvalue(value))
+            condview = inspector.column(align=True).row()
+            condview.label(icon="FILE_CACHE", text="Condition:")
+            condview.label(text=formatvalue(item.condition))
+            
+
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         scene = data
         obj = item
-        
         custom_icon = obj.icon_name
-        
+
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            print("distobj: " + obj.name + ", " + obj.identifier + ", " + obj.icon_name + ", " + obj.custom_args + ", " + str(obj.condition) + ", " + obj.destination_name)
-            row = layout.row()
-            row.label(text="", icon = custom_icon)
-            row.label(text=obj.name)
+            row = layout.row(align=True)
+            row.label(text="", icon=custom_icon)
+            row.label(text=" " + obj.name)
             row.label(icon="FORWARD")
-            minus = row.operator('grouper.dist_remove', text="", icon="REMOVE")
-            minus.to_remove = obj.name
-        
+            row.label(icon="OUTLINER_COLLECTION")
+            row.label(text=obj.destination_name)
+
         elif self.layout_typoe in {"GRID"}:
             layout.alignment = "CENTER"
             layout.label(text="", icon=custom_icon)
-            
+
+
+def formatvalue(value):
+        out = ""
+        if isinstance(value, str):
+            out = "'" + value + "'"
+        else:
+            out = str(value)
+        return out
+
+
+def formatkey(key):
+    return key.capitalize()
+
+
+def wrap(text_to_wrap, element):
+    wrapper = textwrap.TextWrapper(width=30)
+    textlist = wrapper.wrap(text=text_to_wrap)
+    wrapped_block = element.column(align=True)
+    for line in textlist:
+        row = wrapped_block.row(align=True)
+        row.scale_y = 0.6
+        row.label(text=line)
+    
+    
+    
+
+    
+    
