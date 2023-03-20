@@ -5,7 +5,7 @@ from ..utils.logger import logger
 class GROUPER_OT_DistAdd(bpy.types.Operator):
     bl_idname = 'grouper.dist_add'
     bl_label = 'Add Distinguisher'
-    bl_description = 'Add new enum item'
+    bl_description = 'Add a Distinguisher to the ordered list'
 
     use_low = bpy.props.BoolProperty(default=False, name = "Change Low")
     

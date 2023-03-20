@@ -87,11 +87,7 @@ def register_pointers(operation: str = "LOAD"):
         bpy.types.Scene.grouper_mdlist = bpy.props.CollectionProperty(type=GROUPER_PT_MDList)
         bpy.utils.register_class(GROUPER_PT_GDList)
         bpy.types.Scene.grouper_gdlist = bpy.props.CollectionProperty(type=GROUPER_PT_GDList)
-        
-        bpy.types.Scene.grouper_mdlist_index = IntProperty(name="MDList Index", default=0)
-        bpy.types.Scene.grouper_gdlist_index = IntProperty(name="GDList Index", default=0)
-    
-        
+
     elif operation == "UNLOAD":
         try:
             bpy.utils.unregister_class(GROUPER_PT_PrefsProperties)

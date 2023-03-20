@@ -9,6 +9,9 @@ class GROUPER_PT_PrefsProperties(PropertyGroup):
     high_suffix: StringProperty(description="Suffix to append to highpoly objects", default="_high")
     low_collection_name: StringProperty(description="Name of the collections that store lowpoly objects", default="Lowpoly")
     high_collection_name: StringProperty(description="Name of the collections that store highpoly objects", default="Highpoly")
+    
+    bpy.types.Scene.grouper_mdlist_index = IntProperty(name="MDList Index", default=0)
+    bpy.types.Scene.grouper_gdlist_index = IntProperty(name="GDList Index", default=0)
 
 class GROUPER_PT_MDList(PropertyGroup):
     name: StringProperty(default="")

@@ -1,5 +1,5 @@
 import bpy, textwrap
-from bpy.props import BoolProperty
+from bpy.props import BoolProperty, IntProperty
 from bpy.types import Panel, UIList
 from .utils.logger import logger
 from .distinguishers import meshdist
@@ -47,15 +47,15 @@ class GROUPER_PT_EnumsPanel(Panel):
         mdlist_index = bpy.context.scene.grouper_mdlist_index
         scene = context.scene
 
+
         layout = self.layout
-        layout.label(icon="FILE_VOLUME", text="Mesh Seperators")
+        layout.label(icon="FILE_VOLUME", text="Mesh Distinguishers")
+        
         row = layout.row(align=True)
-        
-        
         adjustmentscoll = row.column(align=True)
         adjustmentbox = adjustmentscoll.box()
         listcoll = row.column(align=True)
-        
+
         listcoll.template_list("GROUPER_UL_MDViewer", "MD_List", scene, "grouper_mdlist", scene, "grouper_mdlist_index")
 
         add_button = adjustmentbox.column(align=True)
@@ -110,9 +110,8 @@ class GROUPER_UL_MDViewer(UIList):
         
         inspector = layout.box()
         icontent_header = inspector.row(align=True)
-
-        
         active_item = get_active(mdlist, mdlist_index)
+        
         """
         .name -> str
         .identifier -> str
@@ -124,31 +123,34 @@ class GROUPER_UL_MDViewer(UIList):
 
         if not active_item:
             icontent_header.label(icon="FILE_BLANK")
-            icontent_header.label(text=" Select a Distinguisher")
+            wrap("Select a distinguisher to get started.", icontent_header, 28)
+            helpdesc = inspector.column()
+            helpdesc.label(text="What is this?", icon="OUTLINER_OB_LIGHT")
+            helpcont = helpdesc.box()
+            wrap("In this panel you'll find a list of objects, called 'Distinguishers.'\nThese Distinguishers let you specify what mesh characteristics Grouper considers when it sorts meshes.", helpcont)
+            wrap("The list above is sorted by priority, where the highest entry is considered first.", helpcont)
         else:
             item = meshdist.serialize(active_item)
             icontent_header.label(icon="FILE_VOLUME")
             icontent_header.label(text=" " + item.name)
-            
-            
+
             infoview = inspector.column(align=True)
-            infoview.label(text="Description:")
+            infoview.label(icon="HELP", text="Description:")
             wrap(item.description + ", move the object to '" + item.destination_name + "'", infoview.box())
-            infoview = inspector.column(align=True).row()
-            
+
             argsview = inspector.column(align=True)
             argsview.separator()
             argsview_header= argsview.row(align=True)
-            argsview_header.label(text="Custom Arguments:")
+            argsview_header.label(icon="FILE_CACHE",text="Custom Arguments:")
             argsview_header.operator('grouper.dist_add', icon="MODIFIER_ON", text = "")
             for key, value in item.custom_args.items():
                 arg = argsview.box().row(align=True)
-                arg.label(icon="FILE_CACHE", text=formatkey(key))
-                arg.label(icon="TRIA_RIGHT", text=formatvalue(value))
-            condview = inspector.column(align=True).row()
-            condview.label(icon="FILE_CACHE", text="Condition:")
-            condview.label(text=formatvalue(item.condition))
+                arg.label(icon="KEYFRAME", text=formatkey(key))
+                arg.label(icon="DISCLOSURE_TRI_RIGHT", text=formatvalue(value))
             
+            arg = argsview.box().row(align=True)
+            arg.label(icon="KEYFRAME", text="Condition")
+            arg.label(icon="DISCLOSURE_TRI_RIGHT", text=formatvalue(item.condition))
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         scene = data
@@ -181,8 +183,8 @@ def formatkey(key):
     return key.capitalize()
 
 
-def wrap(text_to_wrap, element):
-    wrapper = textwrap.TextWrapper(width=30)
+def wrap(text_to_wrap, element, w: int = 30):
+    wrapper = textwrap.TextWrapper(width=w)
     textlist = wrapper.wrap(text=text_to_wrap)
     wrapped_block = element.column(align=True)
     for line in textlist:
