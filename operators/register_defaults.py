@@ -2,7 +2,7 @@ import json
 import bpy
 from ..utils import collman
 from ..utils.logger import logger
-from ..distinguishers import meshdist
+from ..distinguishers import meshdist, groupdist
 
 class GROUPER_OT_RegisterDefaults(bpy.types.Operator):
     bl_idname = "grouper.register_defaults"
@@ -12,9 +12,11 @@ class GROUPER_OT_RegisterDefaults(bpy.types.Operator):
     bl_description = 'Registers a set of default Mesh and Group distinguishers'
 
     def execute(self, context):
-        deflist = meshdist.get_defaults()
-        global_mdlist = context.scene.grouper_mdlist
         
+        global_mdlist = context.scene.grouper_mdlist
+        global_gdlist = context.scene.grouper_gdlist
+        
+        deflist = meshdist.get_defaults()
         if not global_mdlist:
             logger.log("Registering Default Distinguishers...", "")
             for entry in deflist:
@@ -26,6 +28,15 @@ class GROUPER_OT_RegisterDefaults(bpy.types.Operator):
                 mdlist.destination_name = entry.destination_name
                 mdlist.description = entry.description
                 
+        deflist = groupdist.get_defaults()
+        if not global_gdlist:
+            for entry in deflist:
+                gdlist = global_gdlist.add()
+                gdlist.group_name = entry.group_name
+                gdlist.identifier = entry.identifier
+                gdlist.suffix_name = entry.suffix_name
+                gdlist.icon_name = entry.icon_name
+            
         
         return {'FINISHED'}
 

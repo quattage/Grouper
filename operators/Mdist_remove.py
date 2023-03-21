@@ -2,7 +2,7 @@ import bpy
 from ..utils.logger import logger
 
 
-class GROUPER_OT_DistRemove(bpy.types.Operator):
+class GROUPER_OT_MDistRemove(bpy.types.Operator):
     bl_idname = 'grouper.dist_remove'
     bl_label = 'Remove Distinguisher'
     bl_description = 'Remove a Distinguisher from the ordered list'
@@ -23,4 +23,4 @@ class GROUPER_OT_DistRemove(bpy.types.Operator):
         return {'FINISHED'}
 
 
-op_class = GROUPER_OT_DistRemove
+op_class = GROUPER_OT_MDistRemove

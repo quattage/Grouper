@@ -1,10 +1,10 @@
 
 
-import sys
+import sys, inspect
 import bpy
 import json, abc
 
-from bpy.types import Object
+from bpy.types import EnumProperty, Object
 from bpy_types import PropertyGroup
 from ..preferences import GROUPER_PT_MDList, GROUPER_PT_GDList
 from ..utils.logger import logger
@@ -33,6 +33,7 @@ class Distinguisher(abc.ABC):
     def set_custom_props(props: list = None):
         pass
 
+
 # DISTINGUISHERS
 class MD_Midpoint(Distinguisher):
     def __init__(self, custom_args: dict = {"above_or_below": False}, condition: bool = True, destination_name: str = ""):
@@ -42,7 +43,7 @@ class MD_Midpoint(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "UGLYPACKAGE"
-        
+
         if custom_args["above_or_below"]:
             self.description = "If the object's polycount is above " + "TEMP"
         else:
@@ -78,7 +79,7 @@ class MD_Subdivision(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "MOD_SMOOTH"
-        
+
         levels = custom_args["levels"]
         if levels > 0:
             self.description = "If the object has at least " + str(levels) + " Sub-D levels"
@@ -101,7 +102,7 @@ class MD_Bevel(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "MOD_BEVEL"
-        
+
         levels = custom_args["segments"]
         if levels > 0:
             self.description = "If the object has at least " + str(levels) + " Bevel levels"
@@ -125,10 +126,10 @@ class MD_WeightedNormal(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "MOD_NORMALEDIT"
-        
+
         levels = custom_args["weight"]
         if levels > 0:
-            self.description = "If the object has Weighted Normals of at least " + levels + " strength"
+            self.description = "If the object has Weighted Normals of at least " + str(levels) + " strength"
         elif levels == 0:
             self.description = "If the object has a Weighted Normals modifier "
         elif levels < 0:
@@ -156,7 +157,8 @@ class MD_SmoothGroups(Distinguisher):
         if not isinstance(obj, Object):
             raise BaseException(self.name + " only accepts instances of objects!")
         return False
-    
+
+
 class MD_Keyword(Distinguisher):
     def __init__(self, custom_args: dict = {"word": "Cube", "exact_match": False}, condition: bool = True, destination_name: str = ""):
         self.custom_args = custom_args
@@ -165,10 +167,10 @@ class MD_Keyword(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "OUTLINER_OB_FONT"
-        
+
         exact = custom_args["exact_match"]
         name = custom_args["word"]
-        
+
         if exact:
             self.description = "If the object's name is '" + name + "'"
         else:
@@ -203,10 +205,21 @@ def serialize(pgitem) -> dict:
         distinguisher = getattr(sys.modules[__name__], identifier)
         instance = distinguisher(custom_args, condition, destination_name)
         return instance
-        
     else: 
         raise TypeError("'" + type(pgitem).__name__ + "' was passed to serializer, expected an MDList PropertyGroup!")
-    
-    
-    
-    
+
+
+def build_enum() -> EnumProperty:
+    distinguishers = []
+    itemlist = []
+    for name, obj in inspect.getmembers(sys.modules[__name__]):
+        if inspect.isclass(obj):
+            if isinstance(obj, type(Distinguisher)) and "MD_" in name:
+                distinguishers.append(obj)
+    for ind, entry in enumerate(distinguishers):
+        if ind == 0:
+            defid = entry.identifier
+        enumentry = (entry().identifier, entry().name, "Distinguisher to group items", entry().icon_name, ind)
+        itemlist.append(enumentry)
+    return bpy.props.EnumProperty(items=itemlist, name="Type:")
+

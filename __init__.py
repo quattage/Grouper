@@ -30,7 +30,7 @@ from bpy.props import IntProperty
 from bpy.app.handlers import persistent
 
 from .panel import GROUPER_PT_OpsPanel
-from .panel import GROUPER_UL_MDViewer
+from .panel import GROUPER_UL_MDViewer, GROUPER_UL_GDViewer
 from .panel import GROUPER_PT_EnumsPanel
 from .preferences import GROUPER_PT_PrefsPanel
 from .preferences import GROUPER_PT_PrefsProperties, GROUPER_PT_MDList, GROUPER_PT_GDList
@@ -41,7 +41,8 @@ GROUPER_Misc = [
     GROUPER_PT_OpsPanel,
     GROUPER_PT_PrefsPanel,
     GROUPER_PT_EnumsPanel,
-    GROUPER_UL_MDViewer
+    GROUPER_UL_MDViewer,
+    GROUPER_UL_GDViewer
 ]
 
 
