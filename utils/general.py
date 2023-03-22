@@ -32,6 +32,13 @@ class listutils:
         return None
 
 class stringutils:
+    def find_nth(string, key, n):
+        base = string.find(key)
+        while base >= 0 and n > 1:
+            base = string.find(key, base + len(key))
+            n -= 1
+        return base
+    
     def formatsuffix(value):
         out = str(value).lower()
         formatted = re.sub(r'\W+', '', re.sub("_", '', out))

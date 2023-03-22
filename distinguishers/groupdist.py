@@ -71,6 +71,7 @@ def register_group(group_name, suffix_name, icon_name, context):
     new_item.group_name = group_name
     new_item.suffix_name = suffix_name
     new_item.icon_name = icon_name
+    new_item.identifier = "GD_" + group_name + ":" + suffix_name
     return new_item
 
 

@@ -1,5 +1,6 @@
 import bpy
 from bpy.types import Collection
+from ..utils.general import stringutils
 
 unresolved_collections = []
 moved_collections = []
@@ -25,7 +26,7 @@ def get(name: str) -> Collection:
     raise BaseException("A collection called " + name + " was not found!")
 
 
-def create(name: str) -> Collection:
+def create(name: str, icon_name: str = "OUTLINER_COLLECTION") -> Collection:
     """Creates a new orphan collection and returns it. If a collection
     of this name already exists, that instance will be returned.
     Note: This collection will not be linked to the scene! It must
@@ -35,6 +36,12 @@ def create(name: str) -> Collection:
         unresolved_collections.append(check)
         return check
     coll = bpy.data.collections.new(name)
+    
+    if icon_name != "OUTLINER_COLLECTION":
+        tag = "COLOR" + icon_name[stringutils.find_nth(icon_name, "_", 2):]
+        coll.color_tag = tag
+        print(tag)
+    
     return coll
 
 

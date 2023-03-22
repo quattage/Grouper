@@ -1,5 +1,6 @@
 import bpy
 from bpy.types import Panel, UIList
+from .preferences import GROUPER_PT_MDList
 from .distinguishers import meshdist
 from .utils.general import stringutils, listutils
 
@@ -65,9 +66,10 @@ def draw_mdlist_viewer(scene, layout, mdlist, mdlist_index):
     add_button = adjustmentbox.column(align=True)
     add_button.operator('grouper.dist_add', icon="ADD", text="")
 
+    active_item = listutils.get_active(mdlist, mdlist_index)
     sub_button = add_button.row(align=True)
     sub_button.operator('grouper.dist_remove', icon="REMOVE", text="")
-    sub_button.enabled = listutils.is_positional(mdlist)
+    sub_button.enabled = listutils.is_positional(mdlist) and isinstance(active_item, GROUPER_PT_MDList)
 
     move_buttons = add_button.column(align=True)
     move_buttons.enabled = listutils.get_active(mdlist, mdlist_index) and listutils.is_positional(mdlist)
@@ -95,25 +97,40 @@ def draw_gdlist_select(scene, layout, gdlist, gdlist_index):
     add_button.operator('grouper.gdist_add', icon="ADD", text="")
 
     sub_button = add_button.row(align=True)
-    sub_button.operator('grouper.dist_remove', icon="REMOVE", text="")
+    sub_button.operator('grouper.gdist_remove', icon="REMOVE", text="")
     sub_button.enabled = listutils.is_positional(gdlist)
 
     move_buttons = add_button.column(align=True)
     move_buttons.enabled = listutils.get_active(gdlist, gdlist_index) and listutils.is_positional(gdlist)
 
     move_buttons_up = move_buttons.row(align=True)
-    move_buttons_up.operator('grouper.dist_up', icon="TRIA_UP", text="")
+    move_buttons_up.operator('grouper.gdist_up', icon="TRIA_UP", text="")
     move_buttons_up.enabled = listutils.can_move_up(gdlist_index)
 
     move_buttons_down = move_buttons.row(align=True)
-    move_buttons_down.operator('grouper.dist_down', icon="TRIA_DOWN", text="")
+    move_buttons_down.operator('grouper.gdist_down', icon="TRIA_DOWN", text="")
     move_buttons_down.enabled = listutils.can_move_down(gdlist, gdlist_index)
         
     helpbox = adjustmentscoll.box()
-    helpbox.operator('grouper.dist_help', icon="QUESTION", text="")
+    helpbox.operator('grouper.gdist_help', icon="QUESTION", text="")
 
 
 class GROUPER_UL_GDViewer(UIList):
+    def draw_filter(self, context, layout):
+        gdlist = bpy.context.scene.grouper_gdlist
+        gdlist_index = bpy.context.scene.grouper_gdlist_index
+        
+        inspector = layout.box()
+        icontent_header = inspector.row(align=True)
+        active_item = listutils.get_active(gdlist, gdlist_index)
+        
+        
+        if not active_item:
+            icontent_header.label(icon="FILE_BLANK", text="No group selected")
+        else:
+            info = inspector.row()
+            info.label(text=active_item.group_name)
+        
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         obj = item
         
@@ -125,7 +142,6 @@ class GROUPER_UL_GDViewer(UIList):
 
 class GROUPER_UL_MDViewer(UIList):
     def draw_filter(self, context, layout):
-        prefs = bpy.context.scene.grouper_prefs 
         mdlist = bpy.context.scene.grouper_mdlist
         mdlist_index = bpy.context.scene.grouper_mdlist_index
         

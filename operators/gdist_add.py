@@ -51,6 +51,7 @@ class GROUPER_OT_GDistAdd(Operator):
             return {'CANCELLED'}
         
         groupdist.register_group(self.name, stringutils.formatsuffix(self.suffix), self.colors, context)
+        
         context.scene.grouper_gdlist_index = len(context.scene.grouper_gdlist) - 1
         
         return {'FINISHED'}

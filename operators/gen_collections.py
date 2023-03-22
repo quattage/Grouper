@@ -13,18 +13,16 @@ class GROUPER_OT_GenCollections(bpy.types.Operator):
         logger.log("Generating Collections", "")
         props = bpy.context.scene.grouper_prefs
         
+        gdlist = context.scene.grouper_gdlist
+        
         raw = collman.create("Raw")
-        unresolved = collman.create("Unresolved")
-        bake_groups = collman.create("Bake Groups")
-        group_1 = collman.create("Group_1")
-        low = collman.create(props.low_collection_name + "_1")
-        high = collman.create(props.high_collection_name + "_1")
+        groups = collman.create("Groups")
         collman.link(raw)
-        collman.link_hierarchy([bake_groups, group_1, high])
-        collman.link_to(low, group_1)
-        collman.link_to(unresolved, bake_groups)
+        collman.link(groups)
         
-        
+        for coll in gdlist:
+            ac = collman.create(coll.group_name, coll.icon_name)
+            collman.link_to(ac, groups)
         
         return {'FINISHED'}
 

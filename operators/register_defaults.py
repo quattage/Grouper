@@ -36,7 +36,7 @@ class GROUPER_OT_RegisterDefaults(bpy.types.Operator):
                 gdlist.identifier = entry.identifier
                 gdlist.suffix_name = entry.suffix_name
                 gdlist.icon_name = entry.icon_name
-            
+                
         
         return {'FINISHED'}
 
