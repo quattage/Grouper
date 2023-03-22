@@ -92,7 +92,7 @@ def draw_gdlist_select(scene, layout, gdlist, gdlist_index):
     listcoll = row.column(align=True)
     listcoll.template_list("GROUPER_UL_GDViewer", "GD_List", scene, "grouper_gdlist", scene, "grouper_gdlist_index")
     add_button = adjustmentbox.column(align=True)
-    add_button.operator('grouper.dist_add', icon="ADD", text="")
+    add_button.operator('grouper.gdist_add', icon="ADD", text="")
 
     sub_button = add_button.row(align=True)
     sub_button.operator('grouper.dist_remove', icon="REMOVE", text="")
@@ -166,7 +166,7 @@ class GROUPER_UL_MDViewer(UIList):
 
             gdlist = context.scene.grouper_gdlist
             
-            if listutils.isinvalid(gdlist, item.destination_name):
+            if listutils.get_gd_from_name(gdlist, item.destination_name):
                 infoview.separator()
                 infoview.label(icon="ERROR", text= "WARNING!")
                 warning = infoview.box()
@@ -196,10 +196,11 @@ class GROUPER_UL_MDViewer(UIList):
             row.label(text=" " + obj.name)
             row.label(icon="FORWARD")
             
-            if listutils.isinvalid(gdlist, item.destination_name):
-                row.label(icon="SEQUENCE_COLOR_01", text="Invalid")
+            gdobj = listutils.get_gd_from_name(gdlist, item.destination_name) 
+            if not gdobj:
+                row.label(icon="SEQUENCE_COLOR_01", text="INVALID")
             else:
-                row.label(icon="OUTLINER_COLLECTION", text=obj.destination_name)
+                row.label(icon=gdobj.icon_name, text=obj.destination_name)
 
         elif self.layout_typoe in {"GRID"}:
             layout.alignment = "CENTER"

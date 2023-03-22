@@ -24,11 +24,11 @@ class listutils:
         return mdlist_index < len(mdlist) - 1
     
     
-    def isinvalid(dlist, name):
-        names = []
-        for obj in dlist:        
-            names.append(obj.group_name)    
-        return not name in names
+    def get_gd_from_name(dlist, name):
+        for obj in dlist:
+            if obj.group_name == name:
+                return obj
+        return None
 
 class stringutils:
     def formatvalue(value):
