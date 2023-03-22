@@ -2,6 +2,7 @@ import bpy
 from bpy.props import EnumProperty
 from bpy.types import Operator, Panel
 from ..utils.logger import logger
+from ..utils.general import stringutils
 from ..distinguishers import meshdist, groupdist
 
 class GROUPER_OT_MDistAdd(Operator):

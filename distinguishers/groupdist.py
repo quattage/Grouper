@@ -36,10 +36,9 @@ class CollectionDistinguisher():
                 self.icon_name = "COLLECTION_COLOR_0" + str(color) 
         else:
             self.icon_name = color
-            
         if suffix_name[0] != "_":
             suffix_name = "_" + suffix_name
-
+            
         self.group_name = group_name
         self.suffix_name = suffix_name
         self.identifier = "GD_" + self.group_name + ":" + self.suffix_name
@@ -63,8 +62,16 @@ def serialize(pgitem) -> dict:
         icon_name = pgitem.icon_name
         instance = CollectionDistinguisher(group_name, suffix_name, icon_name)
         return instance
-    else: 
+    else:
         raise TypeError("'" + type(pgitem).__name__ + "' was passed to serializer, expected a CollectionDistinguisher")
+
+
+def register_group(group_name, suffix_name, icon_name, context):
+    new_item = context.scene.grouper_gdlist.add()
+    new_item.group_name = group_name
+    new_item.suffix_name = suffix_name
+    new_item.icon_name = icon_name
+    return new_item
 
 
 def get_colls_as_enum_entries(self, context) -> list:

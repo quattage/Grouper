@@ -1,4 +1,5 @@
 
+import re
 import textwrap
 import bpy
 
@@ -31,6 +32,13 @@ class listutils:
         return None
 
 class stringutils:
+    def formatsuffix(value):
+        out = str(value).lower()
+        formatted = re.sub(r'\W+', '', re.sub("_", '', out))
+        if formatted[0] != "_":
+            formatted = "_" + formatted
+        return formatted
+
     def formatvalue(value):
         out = ""
         if isinstance(value, str):
