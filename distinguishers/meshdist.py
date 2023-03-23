@@ -180,6 +180,21 @@ class MD_Keyword(Distinguisher):
         if not isinstance(obj, Object):
             raise BaseException(self.name + " only accepts instances of objects!")
         return False
+    
+class MD_Mesh(Distinguisher):
+    def __init__(self, custom_args: dict = {}, condition: bool = True, destination_name: str = ""):
+        self.custom_args = custom_args
+        self.name = "Mesh Objects"
+        self.identifier = __class__.__name__
+        self.condition = condition
+        self.destination_name = destination_name
+        self.icon_name = "MESH_CUBE"
+        self.description = "If the object is a mesh object"
+
+    def isfulfilled(self, obj: object = None) -> bool:
+        if not isinstance(obj, Object):
+            raise BaseException(self.name + " only accepts instances of objects!")
+        return False
 # DISTINGUISHERS
 
 
@@ -188,6 +203,7 @@ def get_defaults() -> dict:
         MD_Keyword({"word": "_high", "exact_match": False}, True, "Highpoly"),
         MD_Bevel({"segments": 1}, True, "Highpoly"),
         MD_Subdivision({"levels": 1}, True, "Highpoly"),
+        MD_Mesh({}, True, "Unresolved"),
     ]
     return distlist
 

@@ -23,6 +23,7 @@ class GROUPER_OT_RegisterDefaults(bpy.types.Operator):
                 mdlist = global_mdlist.add()
                 mdlist.name = entry.name
                 mdlist.identifier = entry.identifier
+                mdlist.condition = entry.condition
                 mdlist.icon_name = entry.icon_name
                 mdlist.custom_args = json.dumps(entry.custom_args)
                 mdlist.destination_name = entry.destination_name

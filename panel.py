@@ -121,15 +121,23 @@ class GROUPER_UL_GDViewer(UIList):
         gdlist_index = bpy.context.scene.grouper_gdlist_index
         
         inspector = layout.box()
-        icontent_header = inspector.row(align=True)
+        info = inspector.row(align=True).box()
         active_item = listutils.get_active(gdlist, gdlist_index)
         
         
         if not active_item:
-            icontent_header.label(icon="FILE_BLANK", text="No group selected")
+            info.label(icon="FILE_BLANK", text="No group selected.")
+            helpdesc = inspector.column()
+            helpdesc.label(text="What is this?", icon="OUTLINER_OB_LIGHT")
+            helpcont = helpdesc.box()
+            stringutils.wrap("This panel contains a list of collections. These are where objects will end up when they get sorted.", helpcont)
+            stringutils.wrap("The list order doesn't matter, but it will be retained in the Outliner. You can push changes to the Outliner by pressing the 'Generate' button.", helpcont)
         else:
-            info = inspector.row()
-            info.label(text=active_item.group_name)
+            la = info.row()
+            la.label(text=active_item.group_name)
+            
+            la.operator('grouper.gdist_edit', icon="MODIFIER_ON", text="")
+            
         
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         obj = item
@@ -137,7 +145,13 @@ class GROUPER_UL_GDViewer(UIList):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             row = layout.row(align=True)
             row.label(text=obj.group_name, icon=obj.icon_name)
-            row.label(text=obj.suffix_name, icon="DISCLOSURE_TRI_RIGHT")
+            if obj.suffix_name:
+                row.label(text=obj.suffix_name, icon="DISCLOSURE_TRI_RIGHT")
+            else:
+                nosuf = row.row()
+                nosuf.label(text="No Suffix", icon="LAYER_USED") 
+                nosuf.enabled = False
+                
 
 
 class GROUPER_UL_MDViewer(UIList):
@@ -171,7 +185,7 @@ class GROUPER_UL_MDViewer(UIList):
             item = meshdist.serialize(active_item)
             icontent_header.label(icon="FILE_VOLUME")
             icontent_header.label(text=" " + item.name)
-            icontent_header.operator('grouper.dist_add', icon="MODIFIER_ON", text = "")
+            icontent_header.operator('grouper.dist_add', icon="MODIFIER_ON", text="")
 
             infoview = inspector.column(align=True)
             infoview.label(icon="HELP", text="Description:")
@@ -179,10 +193,13 @@ class GROUPER_UL_MDViewer(UIList):
                 stringutils.wrap(item.description + ", move the object to '" + item.destination_name + "'", infoview.box())
             else:
                 stringutils.wrap("'" + item.name + "' has no description. You may wanna report this.", infoview.box())
-
+                
+            cond= infoview.box().row(align=True)
+            cond.label(icon="KEYFRAME", text="Condition")
+            cond.label(icon="DISCLOSURE_TRI_RIGHT", text=stringutils.formatvalue(item.condition))
             gdlist = context.scene.grouper_gdlist
             
-            if listutils.get_gd_from_name(gdlist, item.destination_name):
+            if not listutils.get_gd_from_name(gdlist, item.destination_name):
                 infoview.separator()
                 infoview.label(icon="ERROR", text= "WARNING!")
                 warning = infoview.box()
@@ -196,10 +213,6 @@ class GROUPER_UL_MDViewer(UIList):
                 arg = argsview.box().row(align=True)
                 arg.label(icon="KEYFRAME", text=stringutils.formatkey(key))
                 arg.label(icon="DISCLOSURE_TRI_RIGHT", text=stringutils.formatvalue(value))
-
-            arg = argsview.box().row(align=True)
-            arg.label(icon="KEYFRAME", text="Condition")
-            arg.label(icon="DISCLOSURE_TRI_RIGHT", text=stringutils.formatvalue(item.condition))
 
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         obj = item

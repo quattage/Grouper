@@ -27,7 +27,7 @@ class GROUPER_PT_MDList(PropertyGroup):
     identifier: StringProperty(default="")
     icon_name: StringProperty(default="")
     custom_args: StringProperty(default="")
-    condition: BoolProperty(default=True)
+    condition: BoolProperty()
     destination_name: StringProperty(default="")
     description: StringProperty(default="")
 

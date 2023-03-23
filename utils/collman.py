@@ -31,16 +31,23 @@ def create(name: str, icon_name: str = "OUTLINER_COLLECTION") -> Collection:
     of this name already exists, that instance will be returned.
     Note: This collection will not be linked to the scene! It must
     be linked for it to show up in the outliner!"""
+    
+    formatted_name = ""
+    if icon_name != "OUTLINER_COLLECTION":
+        formatted_name = "COLOR" + icon_name[stringutils.find_nth(icon_name, "_", 2):]
     check = is_created(name)
     if check:
         unresolved_collections.append(check)
+        if formatted_name:
+            check.color_tag = formatted_name
+        
         return check
-    coll = bpy.data.collections.new(name)
+
     
-    if icon_name != "OUTLINER_COLLECTION":
-        tag = "COLOR" + icon_name[stringutils.find_nth(icon_name, "_", 2):]
-        coll.color_tag = tag
-        print(tag)
+    
+    coll = bpy.data.collections.new(name)
+    if formatted_name:
+        coll.color_tag = formatted_name
     
     return coll
 
@@ -119,13 +126,13 @@ def is_linked(collection: Collection) -> bool:
         return False
 
 
-def is_created(collection_name: Collection) -> bool:
+def is_created(collection_name: Collection) -> Collection | None:
     """Returns true if a collection of this name is created anywhere the blend file.
-    Does not have to be linked."""
+    Does not have to be linked. Returns collection instance if it exists."""
     check = bpy.data.collections.get(collection_name)
     if check:
         return check
-    return False
+    return None
 
 
 def link_to(coll_child: Collection, coll_parent: Collection):

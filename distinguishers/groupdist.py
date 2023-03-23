@@ -36,8 +36,11 @@ class CollectionDistinguisher():
                 self.icon_name = "COLLECTION_COLOR_0" + str(color) 
         else:
             self.icon_name = color
-        if suffix_name[0] != "_":
-            suffix_name = "_" + suffix_name
+        if suffix_name:
+            if suffix_name[0] != "_":
+                suffix_name = "_" + suffix_name
+        else:
+            suffix_name = ""
             
         self.group_name = group_name
         self.suffix_name = suffix_name
@@ -46,13 +49,14 @@ class CollectionDistinguisher():
 
 def get_defaults() -> list:
     distlist = [
-        CollectionDistinguisher("Highpoly", "_high", 1),
-        CollectionDistinguisher("Lowpoly", "_low", 2)
+        CollectionDistinguisher("Highpoly", "_high", 5),
+        CollectionDistinguisher("Lowpoly", "_low", 5),
+        CollectionDistinguisher("Unresolved", "", 2)
     ]
     return distlist
 
 
-def serialize(pgitem) -> dict:
+def serialize(pgitem) -> CollectionDistinguisher:
     """Creates a new Distinguisher object based on data from an input PropertyGroup"""
     if pgitem is None:
         raise TypeError("Serializer was passed a NoneType!")

@@ -41,10 +41,12 @@ class stringutils:
     
     def formatsuffix(value):
         out = str(value).lower()
-        formatted = re.sub(r'\W+', '', re.sub("_", '', out))
-        if formatted[0] != "_":
-            formatted = "_" + formatted
-        return formatted
+        if out:
+            formatted = re.sub(r'\W+', '', re.sub("_", '', out))
+            if formatted[0] != "_":
+                formatted = "_" + formatted
+            return formatted
+        return out
 
     def formatvalue(value):
         out = ""

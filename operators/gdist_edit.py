@@ -21,10 +21,10 @@ def colors(self, context) -> list:
     return names
 
 
-class GROUPER_OT_GDistAdd(Operator):
-    bl_idname = 'grouper.gdist_add'
-    bl_label = 'Add Group'
-    bl_description = 'Add a Collection to the list of Group Distinguishers'
+class GROUPER_OT_GDistEdit(Operator):
+    bl_idname = 'grouper.gdist_edit'
+    bl_label = 'Edit Group'
+    bl_description = 'Edit an existing Group Collection'
     bl_options = {"UNDO"}
 
     name: StringProperty(default="", name = "", description="Collection Name")
@@ -33,26 +33,20 @@ class GROUPER_OT_GDistAdd(Operator):
 
     def execute(self, context):
         gdlist = bpy.context.scene.grouper_gdlist
+        gdlist_index = bpy.context.scene.grouper_gdlist_index
         
         if not self.name:
             self.report({"ERROR"}, "Collection name must not be blank!")
             return {'CANCELLED'}
         
         if not self.suffix:
-            self.report({"INFO"}, "Collection '" + self.name + "' was initialized with a blank suffix")
+            self.report({"INFO"}, "Collection '" + self.name + "' was reinitialized with a blank suffix")
         
-        existing_names = []
-        for obj in gdlist:
-            existing_names.append(obj.group_name.upper())
-        
-        compare = self.name.upper()
-        if compare in existing_names:
-            self.report({"ERROR"}, "Name '" + self.name + "' already taken!")
-            return {'CANCELLED'}
+        gdlist.remove(gdlist_index)
         
         groupdist.register_group(self.name, stringutils.formatsuffix(self.suffix), self.colors, context)
-        
-        context.scene.grouper_gdlist_index = len(context.scene.grouper_gdlist) - 1
+        gdlist.move(len(context.scene.grouper_gdlist) - 1, gdlist_index)
+        context.scene.grouper_gdlist_index = gdlist_index         # this is literally just to force a refresh callback on the uilist, i am sorry this is dumb
         
         return {'FINISHED'}
     
@@ -88,7 +82,15 @@ class GROUPER_OT_GDistAdd(Operator):
         
         
     def invoke(self, context, event):
+        gdlist = context.scene.grouper_gdlist
+        gdlist_index = context.scene.grouper_gdlist_index
+        active = gdlist[gdlist_index]
+        if active:
+            self.name = active.group_name
+            self.suffix = active.suffix_name
+            self.colors = active.icon_name
+        
         return context.window_manager.invoke_props_dialog(self, width=200)
 
 
-op_class = GROUPER_OT_GDistAdd
+op_class = GROUPER_OT_GDistEdit
