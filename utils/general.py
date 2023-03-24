@@ -24,12 +24,6 @@ class listutils:
     def can_move_down(mdlist, mdlist_index) -> bool:
         return mdlist_index < len(mdlist) - 1
     
-    
-    def get_gd_from_name(dlist, name):
-        for obj in dlist:
-            if obj.group_name == name:
-                return obj
-        return None
 
 class stringutils:
     def find_nth(string, key, n):

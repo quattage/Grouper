@@ -60,7 +60,7 @@ def serialize(pgitem) -> CollectionDistinguisher:
     """Creates a new Distinguisher object based on data from an input PropertyGroup"""
     if pgitem is None:
         raise TypeError("Serializer was passed a NoneType!")
-    if isinstance(pgitem, CollectionDistinguisher):         # Instantiate a Mesh Distinguisher
+    if isinstance(pgitem, CollectionDistinguisher):         # Instantiate a CollectionDistinguisher
         group_name = pgitem.group_name
         suffix_name = pgitem.suffix_name
         icon_name = pgitem.icon_name
@@ -86,6 +86,20 @@ def get_colls_as_enum_entries(self, context) -> list:
         enumentry = (entry.identifier, entry.group_name, "Collection to add grouped items to", entry.icon_name, ind)
         itemlist.append(enumentry)
     return itemlist
+
+
+def get_obj_from_name(dlist, name):
+    for obj in dlist:
+        if obj.group_name == name:
+            return obj
+    return None
+
+
+def get_obj_from_id(dlist, identifier):    
+    for obj in dlist:
+        if obj.identifier == identifier:
+            return obj
+    return None
 
 
 def build_enum() -> EnumProperty:

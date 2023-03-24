@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import Panel, UIList
 from .preferences import GROUPER_PT_MDList
-from .distinguishers import meshdist
+from .distinguishers import meshdist, groupdist
 from .utils.general import stringutils, listutils
 
 
@@ -87,7 +87,7 @@ def draw_mdlist_viewer(scene, layout, mdlist, mdlist_index):
 
 
 def draw_gdlist_select(scene, layout, gdlist, gdlist_index):
-    layout.label(icon="OUTLINER_COLLECTION", text="Group Distinguishers")
+    layout.label(icon="OUTLINER_COLLECTION", text="Categories")
     row = layout.row(align=True)
     adjustmentscoll = row.column(align=True)
     adjustmentbox = adjustmentscoll.box()
@@ -126,11 +126,11 @@ class GROUPER_UL_GDViewer(UIList):
         
         
         if not active_item:
-            info.label(icon="FILE_BLANK", text="No group selected.")
+            info.label(icon="FILE_BLANK", text="No collection selected.")
             helpdesc = inspector.column()
             helpdesc.label(text="What is this?", icon="OUTLINER_OB_LIGHT")
             helpcont = helpdesc.box()
-            stringutils.wrap("This panel contains a list of collections. These are where objects will end up when they get sorted.", helpcont)
+            stringutils.wrap("This panel represents a list of collections. These collections serve as containers to recieve objects.", helpcont)
             stringutils.wrap("The list order doesn't matter, but it will be retained in the Outliner. You can push changes to the Outliner by pressing the 'Generate' button.", helpcont)
         else:
             la = info.row()
@@ -199,7 +199,7 @@ class GROUPER_UL_MDViewer(UIList):
             cond.label(icon="DISCLOSURE_TRI_RIGHT", text=stringutils.formatvalue(item.condition))
             gdlist = context.scene.grouper_gdlist
             
-            if not listutils.get_gd_from_name(gdlist, item.destination_name):
+            if not groupdist.get_obj_from_name(gdlist, item.destination_name):
                 infoview.separator()
                 infoview.label(icon="ERROR", text= "WARNING!")
                 warning = infoview.box()
@@ -225,7 +225,7 @@ class GROUPER_UL_MDViewer(UIList):
             row.label(text=" " + obj.name)
             row.label(icon="FORWARD")
             
-            gdobj = listutils.get_gd_from_name(gdlist, item.destination_name) 
+            gdobj = groupdist.get_obj_from_name(gdlist, item.destination_name) 
             if not gdobj:
                 row.label(icon="SEQUENCE_COLOR_01", text="INVALID")
             else:

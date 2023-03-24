@@ -208,7 +208,7 @@ def get_defaults() -> dict:
     return distlist
 
 
-def serialize(pgitem) -> dict:
+def serialize(pgitem) -> Distinguisher:
     """Creates a new Distinguisher object based on data from an input PropertyGroup"""
     if pgitem is None:
         raise TypeError("Serializer was passed a NoneType!")
@@ -225,6 +225,28 @@ def serialize(pgitem) -> dict:
         raise TypeError("'" + type(pgitem).__name__ + "' was passed to serializer, expected an MDList PropertyGroup!")
 
 
+def serialize_from_enum(enuminput: list) -> Distinguisher:
+    """Creates a new Distinguisher object based on data from an input list of 4 tuples: [(id), (name), (description), (icon)]
+    The second two tuples are actually not necessary, they can be blank strings if future me feels saucy.
+    Ingesting the entire tuple makes it easier to take an enumentry as an input. I'm not sure if this is even going to be used."""
+    if not isinstance(enuminput, list):
+        raise TypeError("Object of type '" + type(enuminput).__name__ + "' was passed to serializer, expected a list!")
+    if len(enuminput) != 4:
+        raise BaseException("A tuple of length " + str(len(enuminput)) + "was passed. Input list must have exactly 4 members!")
+    
+    raise BaseException("this function has no implementation yet :33")
+
+
+def serialize_from_identifier(identifier: str) -> Distinguisher:
+    """Creates a new Distinguisher with DEFAULT SETTINGS from its identifier. Returns the Distinguisher instance. Useful for creating new Distinguishers based on user-inputs."""
+    if not isinstance(identifier, str):
+        raise TypeError("Object of type '" + type(identifier).__name__ + "' was passed to serializer, expected a string!")
+    if not identifier[:3] == "MD_":
+        raise BaseException("Distinguisher with the ID '" + identifier + "' is not valid! Mesh Distinguishers always begin with 'MD_'.")
+    distinguisher = getattr(sys.modules[__name__], identifier)
+    return distinguisher()
+
+
 def build_enum() -> EnumProperty:
     distinguishers = []
     itemlist = []
@@ -239,3 +261,13 @@ def build_enum() -> EnumProperty:
         itemlist.append(enumentry)
     return bpy.props.EnumProperty(items=itemlist, name="Type:")
 
+
+def property_from_object(obj):
+    if isinstance(obj, str):
+        pass
+    elif isinstance(obj, int):
+        pass
+    elif isinstance(obj, bool):
+        pass
+    elif isinstance(obj, list):
+        pass
