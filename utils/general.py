@@ -2,6 +2,7 @@
 import re
 import textwrap
 import bpy
+from bpy.props import BoolProperty, IntProperty, StringProperty
 
 from bpy.types import EnumProperty
 
@@ -61,3 +62,51 @@ class stringutils:
             row = wrapped_block.row(align=True)
             row.scale_y = 0.6
             row.label(text=line)
+
+
+class proputils:
+    def property_from_object(obj):
+        if isinstance(obj, str):
+            return StringProperty(default=obj)
+        elif isinstance(obj, int):
+            return IntProperty(default=obj)
+        elif isinstance(obj, bool):
+            return BoolProperty(default=obj)
+        elif isinstance(obj, list):
+            return BaseException("List types are not yet supported.")
+        raise TypeError("Object of type '" + type(obj).__name__ + "' was passed. Expected a string!")
+
+
+    def new_arg_instance_value(context, value, name):
+        if not (isinstance(value, bool) or isinstance(value, int) or isinstance(value, str)):
+            raise TypeError("Object of type '" + type(value).__name__ + "' was passed. Expected a str, int, or bool!")
+        value = str(value)
+        arguments_list = context.scene.grouper_custom_args
+        if value == "True" or value == "False":
+            argument = arguments_list.add()
+            argument.arg_name = value
+            argument.arg_type = "bool"
+            argument.arg_bool = bool(value)
+        elif value.isdigit():
+            argument = arguments_list.add()
+            argument.arg_type = "int"
+            argument.arg_str = value
+        else:
+            argument = arguments_list
+            argument.arg_type = "str"
+            argument.arg_str = value
+        
+
+
+    def get_arg_instance(context, name):
+        arguments_list = context.scene.grouper_custom_args
+        for obj in arguments_list:
+            if obj.name == name:
+                return obj
+
+
+    def populate_args_instance(context, datain: dict = {}):
+        for key, value in datain.items():
+            print(key, value)
+            proputils.new_arg_instance_value(context, value, key)
+

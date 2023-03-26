@@ -260,14 +260,3 @@ def build_enum() -> EnumProperty:
         enumentry = (entry().identifier, entry().name, "Distinguisher to group items", entry().icon_name, ind)
         itemlist.append(enumentry)
     return bpy.props.EnumProperty(items=itemlist, name="Type:")
-
-
-def property_from_object(obj):
-    if isinstance(obj, str):
-        pass
-    elif isinstance(obj, int):
-        pass
-    elif isinstance(obj, bool):
-        pass
-    elif isinstance(obj, list):
-        pass

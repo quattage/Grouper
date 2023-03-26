@@ -22,6 +22,15 @@ class GROUPER_PT_PrefsProperties(PropertyGroup):
     bpy.types.Scene.grouper_gdlist_index = IntProperty(name="GDList Index", default=0, update=ui_refresh)
 
 
+class GROUPER_PT_CustomArgs(PropertyGroup):
+    arg_name: StringProperty(default="")
+    arg_type: StringProperty(default="NONE")
+    arg_str: StringProperty(default="EMPTY")
+    arg_int: IntProperty(default=0)
+    arg_bool: BoolProperty(default=False)
+
+
+
 class GROUPER_PT_MDList(PropertyGroup):
     name: StringProperty(default="")
     identifier: StringProperty(default="")
