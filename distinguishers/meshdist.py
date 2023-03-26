@@ -8,6 +8,7 @@ from bpy.types import EnumProperty, Object
 from bpy_types import PropertyGroup
 from ..preferences import GROUPER_PT_MDList, GROUPER_PT_GDList
 from ..utils.logger import logger
+from ..utils.general import proputils
 
 def hasModifier(obj, name: str) -> bool:
     return True if name in obj.modifiers else False
@@ -247,16 +248,45 @@ def serialize_from_identifier(identifier: str) -> Distinguisher:
     return distinguisher()
 
 
+def update_selected_distinguisher(self, context):
+    distinguisher_args = context.scene.grouper_custom_args
+    logger.log("DISTINGUISHER UPDATE DETECTED", "DEBUG")
+    active_distinguisher = serialize_from_identifier(self.meshdist_types)
+    logger.log("Selected: " + active_distinguisher.name)
+    
+    if len(distinguisher_args) != 0:
+        logger.log("Distinguisher arguments list was cleared!")
+        distinguisher_args.clear()
+    
+    if active_distinguisher.custom_args:
+        for key, value in active_distinguisher.custom_args.items():
+            logger.log("Added new argument -> {" + key + " (" + type(value).__name__ + "): " + str(value) + "}")
+            proputils.new_arg_instance_value(context, key, value)
+    else:
+        logger.log("Distinguisher '" + active_distinguisher.name + "' has no arguments.")
+        
+    count = len(distinguisher_args)
+    if count > 0:
+        logger.log("Arguments list now contains " + str(count) + " object(s).")
+    else:
+        logger.log("Arguments list will remain empty.")
+    
+
+def args_from_prop():
+    pass
+
+
 def build_enum() -> EnumProperty:
     distinguishers = []
     itemlist = []
     for name, obj in inspect.getmembers(sys.modules[__name__]):
         if inspect.isclass(obj):
             if isinstance(obj, type(Distinguisher)) and "MD_" in name:
+                
                 distinguishers.append(obj)
     for ind, entry in enumerate(distinguishers):
         if ind == 0:
             defid = entry.identifier
         enumentry = (entry().identifier, entry().name, "Distinguisher to group items", entry().icon_name, ind)
         itemlist.append(enumentry)
-    return bpy.props.EnumProperty(items=itemlist, name="Type:")
+    return bpy.props.EnumProperty(items=itemlist, name="Type:", update=update_selected_distinguisher)

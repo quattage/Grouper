@@ -15,40 +15,26 @@ class GROUPER_OT_MDistAdd(Operator):
     meshdist_types: meshdist.build_enum()
     groupdists: groupdist.build_enum()
     
-    active_arguments = None
-    
-    
     def execute(self, context):
         mdlist = context.scene.grouper_mdlist
         gdlist = context.scene.grouper_gdlist
-        
-        
         return {'FINISHED'}
-
-
-    def modal(self, context, event):
-        mdlist = context.scene.grouper_mdlist
-        gdlist = bpy.context.scene.grouper_gdlist
-        active_distinguisher =  meshdist.serialize_from_identifier(self.meshdist_types)
-        arguments_list = bpy.context.scene.grouper_custom_args
-        
-        
-        proputils.populate_args_instance(context, active_distinguisher.custom_args)
-        print("AA", arguments_list)
-
 
     def draw(self, context):
         mdlist = context.scene.grouper_mdlist
         gdlist = bpy.context.scene.grouper_gdlist
-        active_distinguisher = meshdist.serialize_from_identifier(self.meshdist_types)
         arguments_list = bpy.context.scene.grouper_custom_args
-        
-        
+        active_distinguisher = meshdist.serialize_from_identifier(self.meshdist_types)
         active_distinguisher.destination_name = self.groupdists
+        #active_distinguisher.custom_args = 
         
+        args = bpy.context.scene.grouper_custom_args
         layout = self.layout
         layout.prop(self, "meshdist_types")
         layout.prop(self, "groupdists")
+        
+        
+        
         display = layout.column()
         
         synop = display.box().row()
@@ -74,10 +60,27 @@ class GROUPER_OT_MDistAdd(Operator):
             stringutils.wrap(active_distinguisher.description + ", move the object to '" + destname + "'", desc, 39)
         else:
             stringutils.wrap("'" + active_distinguisher.name + "' has no description. You may wanna report this.", desc, 39)            
+        
+        argsettings = layout.column(align=True)
+        if len(args) > 0:
+            for item in args:
+                argument = argsettings.box().row()
+                if item.arg_type == "bool":
+                    argument.label(text=stringutils.formatkey(item.arg_name))
+                    argument.prop(data=item, property="arg_bool", text="")
+                elif item.arg_type == "str":
+                    argument.label(text=stringutils.formatkey(item.arg_name))
+                    argument.prop(data=item, property="arg_str", text="")
+                elif item.arg_type == "int":
+                    argument.label(text=stringutils.formatkey(item.arg_name))
+                    argument.prop(data=item, property="arg_int", text="")
+        else:
+            argument = argsettings.box().row()
+            argument.label(text="No custom args")
+            pass
+
 
     def invoke(self, context, event):
-        context.window_manager.modal_handler_add(self)
-        context.window_manager.invoke_props_dialog(self, width=230)
-        return {"RUNNING_MODAL"}
+        return context.window_manager.invoke_props_dialog(self, width=230)
 
 op_class = GROUPER_OT_MDistAdd
