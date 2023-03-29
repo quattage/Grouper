@@ -101,12 +101,6 @@ At the moment, this would effectively group everything together in two collectio
 
 
 
-
-
-    
-
-
-
 createCollection(list of collections)
 
     REVERSE THIS LIST OF COLLECTIONS FIRST BEFORE DOING ANYTHING ELSE HOLY FUCK 
@@ -137,13 +131,29 @@ createCollection(list of collections)
                 link this collection to the Scene collection
             if destionation_collection is not None
                 link this collection to the destination_collection
+
+
+
+-for every object in the list of objects:
+    -for every distinguisher in the list of distinguishers:
+        -call isfulfilled on this distinguisher instance, passing the object
+        -if is fuifilled is true:
+            move the object to the distinguisler's destination collection
+            break out of this loop
             
             
 
-        
-            
-                
-        
+-define a blank "group" list
+-for every object (x) in the list of objects:                
+    -define a blank "match" list
+    -for every other object (y) in the list of objects
+        -if y has the same origin point as x
+            -add y to the "match" list
+            -remove object y from original list so that it can't be re-accessed
+        add "match" to the "group" list
+    
+             
+         
 
 
 #EVERY OBJECT NEEDS TO:

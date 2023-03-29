@@ -16,8 +16,9 @@ class CollectionDistinguisher():
     suffix_name = ""
     identifier = ""
     icon_name = ""
+    for_export = False
 
-    def __init__(self, group_name: str = None, suffix_name: str = None, color: int | str = 0):
+    def __init__(self, group_name: str = None, suffix_name: str = None, color: int | str = 0, for_export: bool = False):
         if not(isinstance(group_name, str) or isinstance(suffix_name, str)):
             raise BaseException("Collection Distinguisher was initialized incorrectly!")
         if isinstance(color, int):
@@ -44,13 +45,14 @@ class CollectionDistinguisher():
             
         self.group_name = group_name
         self.suffix_name = suffix_name
-        self.identifier = "GD_" + self.group_name + ":" + self.suffix_name
+        self.identifier = self.group_name
+        self.for_export = for_export
 
 
 def get_defaults() -> list:
     distlist = [
-        CollectionDistinguisher("Highpoly", "_high", 5),
-        CollectionDistinguisher("Lowpoly", "_low", 5),
+        CollectionDistinguisher("Highpoly", "_high", 5, True),
+        CollectionDistinguisher("Lowpoly", "_low", 5, True),
         CollectionDistinguisher("Unresolved", "", 2)
     ]
     return distlist
@@ -103,4 +105,4 @@ def get_obj_from_id(dlist, identifier):
 
 
 def build_enum() -> EnumProperty:
-    return EnumProperty(items=get_colls_as_enum_entries, name="Destination:")
+    return EnumProperty(items=get_colls_as_enum_entries, name="")

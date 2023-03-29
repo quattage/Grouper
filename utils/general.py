@@ -89,7 +89,6 @@ class proputils:
             argument.arg_name = key
             argument.arg_type = "str"
             argument.arg_str = value
-        
 
 
     def get_arg_instance(context, name):

@@ -46,6 +46,7 @@ class GROUPER_PT_GDList(PropertyGroup):
     identifier: StringProperty(default="")
     suffix_name: StringProperty(default="")
     icon_name: StringProperty(default="")
+    for_export: BoolProperty(default=False)
 
 
 class GROUPER_PT_PrefsPanel(AddonPreferences):

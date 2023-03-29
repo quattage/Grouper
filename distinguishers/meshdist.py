@@ -1,5 +1,3 @@
-
-
 import sys, inspect
 import bpy
 import json, abc
@@ -17,7 +15,7 @@ def hasModifier(obj, name: str) -> bool:
 class Distinguisher(abc.ABC):
     name = ""
     identifier = ""
-    icon_name = ""
+    icon_name = "UGLYPACKAGE"
     custom_args = {}
     condition = True
     destination_name = ""
@@ -33,6 +31,9 @@ class Distinguisher(abc.ABC):
 
     def set_custom_props(props: list = None):
         pass
+    
+    def set_description():
+        pass
 
 
 # DISTINGUISHERS
@@ -43,12 +44,15 @@ class MD_Midpoint(Distinguisher):
         self.identifier = __class__.__name__
         self.condition = condition
         self.destination_name = destination_name
-        self.icon_name = "UGLYPACKAGE"
-
-        if custom_args["above_or_below"]:
+        self.icon_name = "OUTLINER_OB_LATTICE"
+        self.set_description()
+        
+    def set_description(self):
+        if self.custom_args["above_or_below"]:
             self.description = "If the object's polycount is above " + "TEMP"
         else:
             self.description = "If the object's polycount is below " + "TEMP"
+
 
     def isfulfilled(self, obj: object = None) -> bool:
         if not isinstance(obj, Object):
@@ -64,7 +68,10 @@ class MD_UVSets(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "GROUP_UVS"
-        self.description = "If the object has a UV map called " + custom_args["map_name"]
+        self.set_description()
+        
+    def set_description(self):
+        self.description = "If the object has a UV map called '" + self.custom_args["map_name"] + "'"
 
     def isfulfilled(self, obj: object = None) -> bool:
         if not isinstance(obj, Object):
@@ -80,8 +87,10 @@ class MD_Subdivision(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "MOD_SMOOTH"
+        self.set_description()
 
-        levels = custom_args["levels"]
+    def set_description(self):
+        levels = self.custom_args["levels"]
         if levels > 0:
             self.description = "If the object has at least " + str(levels) + " Sub-D levels"
         elif levels == 0:
@@ -103,8 +112,10 @@ class MD_Bevel(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "MOD_BEVEL"
+        self.set_description()
 
-        levels = custom_args["segments"]
+    def set_description(self):
+        levels = self.custom_args["segments"]
         if levels > 0:
             self.description = "If the object has at least " + str(levels) + " Bevel levels"
         elif levels == 0:
@@ -127,16 +138,16 @@ class MD_WeightedNormal(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "MOD_NORMALEDIT"
+        self.set_description()
 
-        levels = custom_args["weight"]
+    def set_description(self):
+        levels = self.custom_args["weight"]
         if levels > 0:
             self.description = "If the object has Weighted Normals of at least " + str(levels) + " strength"
         elif levels == 0:
             self.description = "If the object has a Weighted Normals modifier "
         elif levels < 0:
             self.description = "If the object has Weighted Normals of exactly " + str(levels) + " strength"
-        self.description = ""
-        self.description = ""
 
     def isfulfilled(self, obj: object = None) -> bool:
         if not isinstance(obj, Object):
@@ -151,7 +162,10 @@ class MD_SmoothGroups(Distinguisher):
         self.identifier = __class__.__name__
         self.condition = condition
         self.destination_name = destination_name
-        self.icon_name = "UGLYPACKAGE"
+        self.icon_name = "NORMALS_FACE"
+        self.set_description()
+
+    def set_description(self):
         self.description = "If the object has any sharps or custom normal information"
 
     def isfulfilled(self, obj: object = None) -> bool:
@@ -168,10 +182,11 @@ class MD_Keyword(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "OUTLINER_OB_FONT"
+        self.set_description()
 
-        exact = custom_args["exact_match"]
-        name = custom_args["word"]
-
+    def set_description(self):
+        exact = self.custom_args["exact_match"]
+        name = self.custom_args["word"]
         if exact:
             self.description = "If the object's name is '" + name + "'"
         else:
@@ -181,7 +196,8 @@ class MD_Keyword(Distinguisher):
         if not isinstance(obj, Object):
             raise BaseException(self.name + " only accepts instances of objects!")
         return False
-    
+
+
 class MD_Mesh(Distinguisher):
     def __init__(self, custom_args: dict = {}, condition: bool = True, destination_name: str = ""):
         self.custom_args = custom_args
@@ -190,12 +206,38 @@ class MD_Mesh(Distinguisher):
         self.condition = condition
         self.destination_name = destination_name
         self.icon_name = "MESH_CUBE"
-        self.description = "If the object is a mesh object"
+        self.set_description()
+
+    def set_description(self):
+        self.description = "If the object is a mesh object (meshes, curves, text, etc.)"
 
     def isfulfilled(self, obj: object = None) -> bool:
         if not isinstance(obj, Object):
             raise BaseException(self.name + " only accepts instances of objects!")
-        return False
+        if self.condition:
+            return ismesh(obj)
+        else:
+            return not ismesh(obj)
+
+
+class MD_Default(Distinguisher):
+    def __init__(self, custom_args: dict = {}, condition: bool = True, destination_name: str = ""):
+        self.custom_args = custom_args
+        self.name = "Default"
+        self.identifier = __class__.__name__
+        self.condition = condition
+        self.destination_name = destination_name
+        self.icon_name = "SNAP_FACE"
+        self.set_description()
+
+    def set_description(self):
+        self.description = "If the object has not been captured by any above Distinguishers"
+
+    def isfulfilled(self, obj: object = None) -> bool:
+        if self.condition:
+            return True
+        else:
+            return False
 # DISTINGUISHERS
 
 
@@ -248,6 +290,19 @@ def serialize_from_identifier(identifier: str) -> Distinguisher:
     return distinguisher()
 
 
+def ismesh(obj):
+    acceptable = (
+        "MESH"
+        "CURVE"
+        "FONT"
+    )
+    
+    return obj.type in acceptable
+    
+def ismeshstrict(obj):
+    return obj.type == "MESH"
+
+
 def update_selected_distinguisher(self, context):
     distinguisher_args = context.scene.grouper_custom_args
     logger.log("DISTINGUISHER UPDATE DETECTED", "DEBUG")
@@ -270,15 +325,25 @@ def update_selected_distinguisher(self, context):
         logger.log("Arguments list now contains " + str(count) + " object(s).")
     else:
         logger.log("Arguments list will remain empty.")
-    
 
-def args_from_prop():
-    pass
+
+def get_args_from_prop(context) -> dict:
+    distinguisher_args = context.scene.grouper_custom_args
+    props = {}
+    for arg in distinguisher_args:
+        if arg.arg_type == "bool":
+            props.update({arg.arg_name: arg.arg_bool})
+        elif arg.arg_type == "int":
+            props.update({arg.arg_name: arg.arg_int})
+        elif arg.arg_type == "str":
+            props.update({arg.arg_name: arg.arg_str})
+    return props
 
 
 def build_enum() -> EnumProperty:
     distinguishers = []
     itemlist = []
+    logger.log("BUILDING MESH DISTINGUISHERS ENUM", "DEBUG")
     for name, obj in inspect.getmembers(sys.modules[__name__]):
         if inspect.isclass(obj):
             if isinstance(obj, type(Distinguisher)) and "MD_" in name:
@@ -289,4 +354,4 @@ def build_enum() -> EnumProperty:
             defid = entry.identifier
         enumentry = (entry().identifier, entry().name, "Distinguisher to group items", entry().icon_name, ind)
         itemlist.append(enumentry)
-    return bpy.props.EnumProperty(items=itemlist, name="Type:", update=update_selected_distinguisher)
+    return bpy.props.EnumProperty(items=itemlist, name="", update=update_selected_distinguisher)
