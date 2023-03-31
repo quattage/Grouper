@@ -37,8 +37,11 @@ class GROUPER_OT_RegisterDefaults(bpy.types.Operator):
                 gdlist.identifier = entry.identifier
                 gdlist.suffix_name = entry.suffix_name
                 gdlist.icon_name = entry.icon_name
-                gdlist.for_export = entry.for_export
+                gdlist.export_settings = entry.export_settings
                 
+        
+        if not context.scene.grouper_prefs.export_path:
+                context.scene.grouper_prefs.export_path = bpy.path.abspath("//")
         
         return {'FINISHED'}
 

@@ -2,7 +2,6 @@ import bpy
 from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
 from bpy.types import PropertyGroup
 from bpy.types import AddonPreferences
-from .distinguishers import groupdist
 
 
 def ui_refresh(self, context):
@@ -12,12 +11,25 @@ def ui_refresh(self, context):
     return None
 
 
+def get_export_defaults():
+    default_settings = {
+        "smooth_groups": True,
+        "normals": True,
+        "uvs": True,
+        "materials": False,
+        "triangulate": False,
+        "axis_mode": "STANDARD",  #STANDARD, UNITY, ETC.
+        "scale_factor": 1
+    }
+    return default_settings
+
+
 class GROUPER_PT_PrefsProperties(PropertyGroup):
     low_suffix: StringProperty(description="Suffix to append to lowpoly objects.", default="_low")
     high_suffix: StringProperty(description="Suffix to append to highpoly objects", default="_high")
     low_collection_name: StringProperty(description="Name of the collections that store lowpoly objects", default="Lowpoly")
     high_collection_name: StringProperty(description="Name of the collections that store highpoly objects", default="Highpoly")
-
+    export_path: StringProperty(name="Export Path", description="Path to store OBJ exports.", default="", subtype="FILE_PATH")
     bpy.types.Scene.grouper_mdlist_index = IntProperty(name="MDList Index", default=0, update=ui_refresh)
     bpy.types.Scene.grouper_gdlist_index = IntProperty(name="GDList Index", default=0, update=ui_refresh)
 
@@ -29,6 +41,9 @@ class GROUPER_PT_CustomArgs(PropertyGroup):
     arg_int: IntProperty(default=0)
     arg_bool: BoolProperty(default=False)
 
+class GROUPER_PT_ForExport(PropertyGroup):
+    index: IntProperty(default=0)
+    do_export: BoolProperty(default=False)
 
 
 class GROUPER_PT_MDList(PropertyGroup):
@@ -46,7 +61,7 @@ class GROUPER_PT_GDList(PropertyGroup):
     identifier: StringProperty(default="")
     suffix_name: StringProperty(default="")
     icon_name: StringProperty(default="")
-    for_export: BoolProperty(default=False)
+    export_settings: StringProperty(default="")
 
 
 class GROUPER_PT_PrefsPanel(AddonPreferences):

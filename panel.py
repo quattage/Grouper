@@ -1,16 +1,10 @@
+import json
 import bpy
 from bpy.types import Panel, UIList
 from .preferences import GROUPER_PT_MDList
 from .distinguishers import meshdist, groupdist
 from .utils.general import stringutils, listutils
-
-
-def populate_enums(distlist):
-    enum_items = []
-    for i, entry in enumerate(distlist):
-        enum_items.append((entry[0], entry[0], str(entry[1]), i))
-    print(enum_items)
-    return enum_items
+from .utils.logger import logger
 
 
 class GROUPER_PT_OpsPanel(Panel):
@@ -31,6 +25,8 @@ class GROUPER_PT_OpsPanel(Panel):
         row = layout.row()
         row.prop(context.scene, "poly_midpoint")
         row.operator('grouper.calc_midpoint', text='Calculate')
+        row = layout.row()
+        row.operator('grouper.export_groups')
 
 
 class GROUPER_PT_EnumsPanel(Panel):
@@ -152,7 +148,7 @@ class GROUPER_UL_GDViewer(UIList):
                 nosuf = row.row()
                 nosuf.label(text="No Suffix", icon="LAYER_USED") 
                 nosuf.enabled = False
-            if obj.for_export:
+            if obj.export_settings:
                 row.label(icon="EXPORT")
             else:
                 noex = row.row()

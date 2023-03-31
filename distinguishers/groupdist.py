@@ -2,6 +2,7 @@
 
 import bpy
 import re
+from .. import preferences
 from bpy.props import EnumProperty
 
 from bpy.types import Object
@@ -16,9 +17,10 @@ class CollectionDistinguisher():
     suffix_name = ""
     identifier = ""
     icon_name = ""
-    for_export = False
+    export_settings = {}
+    
 
-    def __init__(self, group_name: str = None, suffix_name: str = None, color: int | str = 0, for_export: bool = False):
+    def __init__(self, group_name: str = None, suffix_name: str = None, color: int | str = 0, export_settings: dict = preferences.get_export_defaults()):
         if not(isinstance(group_name, str) or isinstance(suffix_name, str)):
             raise BaseException("Collection Distinguisher was initialized incorrectly!")
         if isinstance(color, int):
@@ -46,14 +48,17 @@ class CollectionDistinguisher():
         self.group_name = group_name
         self.suffix_name = suffix_name
         self.identifier = self.group_name
-        self.for_export = for_export
+        if export_settings:
+            self.export_settings = str(export_settings)
+        else:
+            self.export_settings = ""
 
 
 def get_defaults() -> list:
     distlist = [
-        CollectionDistinguisher("Highpoly", "_high", 5, True),
-        CollectionDistinguisher("Lowpoly", "_low", 5, True),
-        CollectionDistinguisher("Unresolved", "", 2)
+        CollectionDistinguisher("Highpoly", "_high", 5),
+        CollectionDistinguisher("Lowpoly", "_low", 5),
+        CollectionDistinguisher("Unresolved", "", 2, False)
     ]
     return distlist
 

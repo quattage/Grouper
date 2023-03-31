@@ -33,7 +33,7 @@ from .panel import GROUPER_PT_OpsPanel
 from .panel import GROUPER_UL_MDViewer, GROUPER_UL_GDViewer
 from .panel import GROUPER_PT_EnumsPanel
 from .preferences import GROUPER_PT_PrefsPanel
-from .preferences import GROUPER_PT_PrefsProperties, GROUPER_PT_MDList, GROUPER_PT_GDList, GROUPER_PT_CustomArgs
+from .preferences import GROUPER_PT_PrefsProperties, GROUPER_PT_MDList, GROUPER_PT_GDList, GROUPER_PT_CustomArgs, GROUPER_PT_ForExport
 from .utils.logger import logger
 
 
@@ -65,6 +65,7 @@ def register():
 @persistent
 def load_handler(dummy):
     bpy.ops.grouper.register_defaults()
+    logger.log("SAVE HANDLER CALLBACK UPDATED: " + bpy.path.abspath("//"), "REGISTRY")
 
 
 def load_startup_handler(dummy):
@@ -77,7 +78,7 @@ def unregister():
     register_pointers("UNLOAD")
     register_misc("UNLOAD")
     logger.log("MODULES UNREGISTERED", "REGISTRY")
-    
+
 
 def register_pointers(operation: str = "LOAD"):
     if operation == "LOAD":
@@ -90,6 +91,8 @@ def register_pointers(operation: str = "LOAD"):
         bpy.types.Scene.grouper_gdlist = bpy.props.CollectionProperty(type=GROUPER_PT_GDList)
         bpy.utils.register_class(GROUPER_PT_CustomArgs)
         bpy.types.Scene.grouper_custom_args = bpy.props.CollectionProperty(type=GROUPER_PT_CustomArgs)
+        bpy.utils.register_class(GROUPER_PT_ForExport)
+        bpy.types.Scene.grouper_for_export = bpy.props.CollectionProperty(type=GROUPER_PT_ForExport)
 
     elif operation == "UNLOAD":
         try:
@@ -110,6 +113,11 @@ def register_pointers(operation: str = "LOAD"):
         try:
             bpy.utils.unregister_class(GROUPER_PT_CustomArgs)
             del bpy.types.Scene.GROUPER_PT_CustomArgs
+        except:
+            pass
+        try:
+            bpy.utils.unregister_class(GROUPER_PT_ForExport)
+            del bpy.types.Scene.GROUPER_PT_ForExport
         except:
             pass
         

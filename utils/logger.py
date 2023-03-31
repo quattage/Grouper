@@ -24,3 +24,9 @@ class logger:
             reset = "\u001b[0m"
             header = "\033[93m >>>" + reset
             print(header, prefix + message + reset)
+            
+    
+    def op_error(self, op, message):
+        self.log("Blender Report: " + message, "DEBUG")
+        op.report({"ERROR"}, message)
+        return {"CANCELLED"}
