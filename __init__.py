@@ -29,18 +29,16 @@ import os
 from bpy.props import IntProperty
 from bpy.app.handlers import persistent
 
-from .panel import GROUPER_PT_OpsPanel
+from .panel import GROUPER_PT_OpsPanel, GROUPER_PT_ExportPanel
 from .panel import GROUPER_UL_MDViewer, GROUPER_UL_GDViewer
-from .panel import GROUPER_PT_EnumsPanel
-from .preferences import GROUPER_PT_PrefsPanel
-from .preferences import GROUPER_PT_PrefsProperties, GROUPER_PT_MDList, GROUPER_PT_GDList, GROUPER_PT_CustomArgs, GROUPER_PT_ForExport
+from .preferences import GROUPER_PT_PrefsPanel, GROUPER_PT_PrefsProperties, GROUPER_PT_MDList, GROUPER_PT_GDList, GROUPER_PT_CustomArgs, GROUPER_PT_ForExport
 from .utils.logger import logger
 
 
 GROUPER_Misc = [
     GROUPER_PT_OpsPanel,
     GROUPER_PT_PrefsPanel,
-    GROUPER_PT_EnumsPanel,
+    GROUPER_PT_ExportPanel,
     GROUPER_UL_MDViewer,
     GROUPER_UL_GDViewer
 ]
@@ -65,7 +63,6 @@ def register():
 @persistent
 def load_handler(dummy):
     bpy.ops.grouper.register_defaults()
-    logger.log("SAVE HANDLER CALLBACK UPDATED: " + bpy.path.abspath("//"), "REGISTRY")
 
 
 def load_startup_handler(dummy):

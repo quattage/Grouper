@@ -16,16 +16,6 @@ With the exception of a few cases, such as grouping hierarchies, (see the link_h
 method) this class is only designed to handle singular collections at a time. 
 """
 
-
-def get(name: str) -> Collection:
-    """Gets the collection instances that matches the provided name if
-    one exists. Will throw an """
-    check = is_created(name)
-    if check:
-        return check
-    raise BaseException("A collection called " + name + " was not found!")
-
-
 def create(name: str, icon_name: str = "OUTLINER_COLLECTION") -> Collection:
     """Creates a new orphan collection and returns it. If a collection
     of this name already exists, that instance will be returned.
@@ -126,7 +116,7 @@ def is_linked(collection: Collection) -> bool:
         return False
 
 
-def is_created(collection_name: Collection) -> Collection | None:
+def is_created(collection_name: str) -> Collection | None:
     """Returns true if a collection of this name is created anywhere the blend file.
     Does not have to be linked. Returns collection instance if it exists."""
     check = bpy.data.collections.get(collection_name)

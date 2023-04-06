@@ -26,7 +26,7 @@ class logger:
             print(header, prefix + message + reset)
             
     
-    def op_error(self, op, message):
-        self.log("Blender Report: " + message, "DEBUG")
-        op.report({"ERROR"}, message)
+    def op_error(self, message):
+        logger.log("Blender Report: " + message, "DEBUG")
+        self.report({"ERROR"}, message)
         return {"CANCELLED"}

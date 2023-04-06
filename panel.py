@@ -14,8 +14,13 @@ class GROUPER_PT_OpsPanel(Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
 
+
+
     def draw(self, context):
+        
+
         layout = self.layout
+        cont = layout.column()
         row = layout.row()
         row.operator('grouper.gen_collections', text='Generate')
         row.operator('grouper.test', text='Test')
@@ -25,31 +30,65 @@ class GROUPER_PT_OpsPanel(Panel):
         row = layout.row()
         row.prop(context.scene, "poly_midpoint")
         row.operator('grouper.calc_midpoint', text='Calculate')
-        row = layout.row()
-        row.operator('grouper.export_groups')
+
+        basic = cont.box().column()
+        row = basic.row(align=True)
+        row.operator('grouper.gen_collections', text='Generate')
+        row.operator('grouper.test', text='Test')
+
+        layout.separator()
+        layout.prop(bpy.context.scene.grouper_prefs, "panel_modes", expand=True)
+        mode = bpy.context.scene.grouper_prefs.panel_modes
+        if mode == "Group":
+            draw_sort_panel(self, context)
+        elif mode == "Export":
+            draw_export_panel(self, context)
+        elif mode == "Configure":
+            draw_configs_panel(self, context)
 
 
-class GROUPER_PT_EnumsPanel(Panel):
-    bl_label = "Distinguishers"
-    bl_idname = "GROUPER_PT_EnumsPanel"
+def draw_sort_panel(self, context):
+    pass
+
+def draw_export_panel(self, context):
+    layout = self.layout
+    cont = layout.column()
+    export = cont.box().column()
+    pathrow = export.row(align=True)
+    pathrow.prop(bpy.context.scene.grouper_prefs, "export_path", text="")
+    exres = pathrow.row(align=True)
+    exres.operator("grouper.export_reset", text="", icon="FILE")
+    exres.enabled = bool(bpy.path.abspath("//"))
+    export.operator("grouper.export_groups", text="Export")
+
+
+def draw_configs_panel(self, context):
+    scene = context.scene
+    layout = self.layout
+
+    mdlist = bpy.context.scene.grouper_mdlist
+    mdlist_index = bpy.context.scene.grouper_mdlist_index
+
+    draw_mdlist_viewer(scene, layout, mdlist, mdlist_index)
+    layout.separator()
+
+    gdlist = bpy.context.scene.grouper_gdlist
+    gdlist_index = bpy.context.scene.grouper_gdlist_index
+    draw_gdlist_select(scene, layout, gdlist, gdlist_index)
+
+
+class GROUPER_PT_ExportPanel(Panel):
+    bl_label = "Export"
+    bl_idname = "GROUPER_PT_ExportPanel"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_parent_id = "GROUPER_PT_OpsPanel"
-
+    
     def draw(self, context):
-        scene = context.scene
         layout = self.layout
+        cont = layout.column(align=True)
+        pass
 
-        mdlist = bpy.context.scene.grouper_mdlist
-        mdlist_index = bpy.context.scene.grouper_mdlist_index
-
-        draw_mdlist_viewer(scene, layout, mdlist, mdlist_index)
-        layout.separator()
-
-        gdlist = bpy.context.scene.grouper_gdlist
-        gdlist_index = bpy.context.scene.grouper_gdlist_index
-        draw_gdlist_select(scene, layout, gdlist, gdlist_index)
-        
 
 def draw_mdlist_viewer(scene, layout, mdlist, mdlist_index):
     layout.label(icon="FILE_VOLUME", text="Mesh Distinguishers")

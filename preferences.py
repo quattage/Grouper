@@ -1,4 +1,5 @@
 import bpy
+from .utils.logger import logger
 from bpy.props import BoolProperty, EnumProperty, IntProperty, StringProperty
 from bpy.types import PropertyGroup
 from bpy.types import AddonPreferences
@@ -11,7 +12,7 @@ def ui_refresh(self, context):
     return None
 
 
-def get_export_defaults():
+def get_export_defaults() -> dict:
     default_settings = {
         "smooth_groups": True,
         "normals": True,
@@ -24,12 +25,24 @@ def get_export_defaults():
     return default_settings
 
 
+def get_panel_tabs(scene, context) -> list:
+    panel_tabs = [
+        ("Group", "Group", "Group", 1),
+        ("Export", "Export", "Export", 2),
+        ("Configure", "Configure", "Configure", 3),
+    ]
+    return panel_tabs
+
+
 class GROUPER_PT_PrefsProperties(PropertyGroup):
     low_suffix: StringProperty(description="Suffix to append to lowpoly objects.", default="_low")
     high_suffix: StringProperty(description="Suffix to append to highpoly objects", default="_high")
     low_collection_name: StringProperty(description="Name of the collections that store lowpoly objects", default="Lowpoly")
     high_collection_name: StringProperty(description="Name of the collections that store highpoly objects", default="Highpoly")
+    
     export_path: StringProperty(name="Export Path", description="Path to store OBJ exports.", default="", subtype="FILE_PATH")
+    panel_modes: EnumProperty(name="Panel View", description="Toggles between different display modes for the Grouper Panel.", items=get_panel_tabs)
+    
     bpy.types.Scene.grouper_mdlist_index = IntProperty(name="MDList Index", default=0, update=ui_refresh)
     bpy.types.Scene.grouper_gdlist_index = IntProperty(name="GDList Index", default=0, update=ui_refresh)
 
